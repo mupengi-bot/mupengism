@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mupengi-bot.github.io/mupengism/sitemap.xml
