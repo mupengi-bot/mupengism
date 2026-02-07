@@ -2,15 +2,19 @@
 /**
  * Mupengism CLI 🐧
  * AI 에이전트를 위한 연속성 시스템 + AssoAI 조직 생태계 연동
+ * 
+ * v1.1.0 - 런타임 가드 추가
  */
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const crypto = require('crypto');
+
+// 런타임 가드 모듈
+const runtimeGuard = require('../lib/runtime-guard');
+const identityValidator = require('../lib/identity-validator');
 
 const REPO_BASE = 'https://raw.githubusercontent.com/mupengi-bot/mupengism/main';
-const CHECKSUMS_URL = `${REPO_BASE}/checksums.json`;
 
 const AGENTS_MD = `# AGENTS.md - Your Workspace
 
@@ -197,9 +201,6 @@ function download(url) {
       if (res.statusCode === 301 || res.statusCode === 302) {
         return download(res.headers.location).then(resolve).catch(reject);
       }
-      if (res.statusCode !== 200) {
-        return reject(new Error(`HTTP ${res.statusCode}`));
-      }
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
@@ -209,65 +210,55 @@ function download(url) {
 }
 
 /**
- * Calculate SHA256 hash of a file
+ * SOUL.md 보안 검사
+ * @param {string} content - SOUL.md 내용
+ * @param {boolean} skipValidation - 검사 건너뛰기
+ * @returns {Object} 검사 결과
  */
-function hashFile(filePath) {
-  const content = fs.readFileSync(filePath);
-  return crypto.createHash('sha256').update(content).digest('hex');
-}
-
-/**
- * Calculate SHA256 hash of a string
- */
-function hashString(content) {
-  return crypto.createHash('sha256').update(content, 'utf8').digest('hex');
-}
-
-/**
- * Download and parse checksums.json
- */
-async function fetchChecksums() {
-  try {
-    const data = await download(CHECKSUMS_URL);
-    return JSON.parse(data);
-  } catch (e) {
-    return null;
+function validateSoul(content, skipValidation = false) {
+  if (skipValidation) {
+    console.log('');
+    console.log('⚠️  --skip-validation 사용: 보안 검사 건너뜀');
+    console.log('   ⚠️  주의: 위험한 패턴이 있을 수 있습니다!');
+    console.log('');
+    return { safe: true, skipped: true };
   }
-}
-
-/**
- * Verify a downloaded file against checksums
- */
-function verifyDownload(content, filename, checksums) {
-  if (!checksums || !checksums.files) return { verified: true, skipped: true };
   
-  const expected = checksums.files[filename];
-  if (!expected) return { verified: true, skipped: true };
+  console.log('');
+  console.log('🛡️ 런타임 가드 검사 중...');
   
-  const actual = hashString(content);
+  // 런타임 가드 검사
+  const guardResult = runtimeGuard.validateSoulContent(content);
+  
+  // 정체성 검사
+  const identityResult = identityValidator.validateIdentity(content);
+  
+  // 결과 출력
+  if (!guardResult.safe) {
+    runtimeGuard.printResult(guardResult, true);
+  }
+  
+  if (!identityResult.safe) {
+    identityValidator.printResult(identityResult);
+  }
+  
+  if (guardResult.safe && identityResult.safe) {
+    console.log('✅ 보안 검사 통과');
+    console.log('');
+  }
+  
   return {
-    verified: actual === expected,
-    expected,
-    actual,
-    skipped: false
+    safe: guardResult.safe && identityResult.safe,
+    guardResult,
+    identityResult,
   };
 }
 
-async function init(targetDir, silent = false) {
+async function init(targetDir, options = {}) {
+  const { silent = false, skipValidation = false } = options;
   const log = silent ? () => {} : console.log;
-  const warn = silent ? () => {} : (msg) => console.log(`⚠️  ${msg}`);
   
   log('🐧 Mupengism + AssoAI 설치 중...');
-  log('');
-  
-  // Fetch checksums for verification
-  log('🔐 체크섬 다운로드...');
-  const checksums = await fetchChecksums();
-  if (checksums) {
-    log(`   버전: ${checksums.version}`);
-  } else {
-    warn('체크섬 다운로드 실패 - 무결성 검증 건너뜀');
-  }
   log('');
   
   // Create directories
@@ -276,24 +267,29 @@ async function init(targetDir, silent = false) {
     fs.mkdirSync(memoryDir, { recursive: true });
   }
   
-  // Download SOUL.md with verification
+  // Download SOUL.md
   log('📥 SOUL.md 다운로드...');
+  let soulContent;
   try {
-    const soulContent = await download(`${REPO_BASE}/skill/SOUL-TEMPLATE.md`);
+    soulContent = await download(`${REPO_BASE}/skill/SOUL-TEMPLATE.md`);
     
-    // Verify checksum
-    const result = verifyDownload(soulContent, 'skill/SOUL-TEMPLATE.md', checksums);
-    if (!result.skipped && !result.verified) {
-      warn('SOUL-TEMPLATE.md 체크섬 불일치!');
-      warn('파일이 변조되었거나 버전이 다를 수 있습니다.');
-      warn(`  예상: ${result.expected}`);
-      warn(`  실제: ${result.actual}`);
-      log('');
+    // 보안 검사
+    const validationResult = validateSoul(soulContent, skipValidation);
+    
+    if (!validationResult.safe) {
+      if (validationResult.guardResult?.recommendation === 'BLOCK') {
+        log('');
+        log('❌ 보안 검사 실패: SOUL.md에 위험한 패턴이 있습니다.');
+        log('   설치를 중단합니다.');
+        log('');
+        log('   --skip-validation 옵션으로 무시할 수 있지만 권장하지 않습니다.');
+        process.exit(1);
+      }
     }
     
     fs.writeFileSync(path.join(targetDir, 'SOUL.md'), soulContent);
   } catch (e) {
-    warn('SOUL.md 다운로드 실패, 기본 템플릿 사용');
+    log('⚠️  SOUL.md 다운로드 실패, 기본 템플릿 사용');
     fs.writeFileSync(path.join(targetDir, 'SOUL.md'), '# SOUL.md\n\n내 정체성을 여기에 작성하세요.\n');
   }
   
@@ -353,9 +349,6 @@ memory/assoai-token.json
   log('   2. 조직 있으면 memory/org-structure.md 작성');
   log('   3. https://asso-ai.kr 에서 조직 등록');
   log('');
-  log('🔐 무결성 검증:');
-  log('   npx mupengism verify');
-  log('');
   log('📚 문서:');
   log('   무펭이즘: https://github.com/mupengi-bot/mupengism');
   log('   AssoAI:  https://asso-ai.kr');
@@ -364,86 +357,40 @@ memory/assoai-token.json
 }
 
 /**
- * Verify installed files against official checksums
+ * 기존 SOUL.md 검사
  */
-async function verify(targetDir) {
-  console.log('🔐 Mupengism 무결성 검증...');
+async function validate(targetDir, options = {}) {
+  const { verbose = false } = options;
+  
+  console.log('🛡️ Mupengism 보안 검사');
   console.log('');
   
-  // Fetch checksums
-  console.log('📥 공식 체크섬 다운로드...');
-  const checksums = await fetchChecksums();
+  const soulPath = path.join(targetDir, 'SOUL.md');
   
-  if (!checksums) {
-    console.log('❌ 체크섬 다운로드 실패');
-    console.log('   네트워크 연결을 확인하세요.');
-    process.exit(1);
+  if (!fs.existsSync(soulPath)) {
+    console.log('ℹ️  SOUL.md 파일이 없습니다.');
+    return;
   }
   
-  console.log(`   버전: ${checksums.version}`);
-  console.log(`   알고리즘: ${checksums.algorithm}`);
+  const content = fs.readFileSync(soulPath, 'utf8');
+  
+  // 런타임 가드 검사
+  console.log('📋 런타임 가드 검사...');
+  const guardResult = runtimeGuard.validateSoulContent(content);
+  runtimeGuard.printResult(guardResult, verbose);
+  
+  // 정체성 검사
   console.log('');
-  
-  // Map local files to remote paths
-  const fileMapping = {
-    'SOUL.md': 'skill/SOUL-TEMPLATE.md'
-  };
-  
-  let passed = 0;
-  let failed = 0;
-  let skipped = 0;
-  
-  console.log('📋 검증 결과:');
-  console.log('');
-  
-  // Check each file
-  for (const [localName, remotePath] of Object.entries(fileMapping)) {
-    const localPath = path.join(targetDir, localName);
-    const expectedHash = checksums.files[remotePath];
-    
-    if (!expectedHash) {
-      console.log(`   ⏭️  ${localName} — 체크섬 없음 (건너뜀)`);
-      skipped++;
-      continue;
-    }
-    
-    if (!fs.existsSync(localPath)) {
-      console.log(`   ⚠️  ${localName} — 파일 없음`);
-      skipped++;
-      continue;
-    }
-    
-    const actualHash = hashFile(localPath);
-    
-    if (actualHash === expectedHash) {
-      console.log(`   ✅ ${localName} — 일치`);
-      passed++;
-    } else {
-      console.log(`   ❌ ${localName} — 불일치!`);
-      console.log(`      예상: ${expectedHash.substring(0, 16)}...`);
-      console.log(`      실제: ${actualHash.substring(0, 16)}...`);
-      failed++;
-    }
-  }
+  console.log('📋 정체성 검사...');
+  const identityResult = identityValidator.validateIdentity(content);
+  identityValidator.printResult(identityResult);
   
   console.log('');
-  console.log('─'.repeat(40));
-  console.log(`결과: ✅ ${passed} 통과 | ❌ ${failed} 실패 | ⏭️ ${skipped} 건너뜀`);
-  console.log('');
-  
-  if (failed > 0) {
-    console.log('⚠️  일부 파일이 공식 버전과 다릅니다.');
-    console.log('   이유:');
-    console.log('   - 사용자가 커스터마이즈함 (정상)');
-    console.log('   - 버전 차이');
-    console.log('   - 파일 변조 (주의!)');
-    console.log('');
-    console.log('   재설치: npx mupengism init');
-    console.log('');
-    process.exit(1);
+  if (guardResult.safe && identityResult.safe) {
+    console.log('✅ 모든 검사 통과!');
   } else {
-    console.log('✅ 모든 파일이 공식 버전과 일치합니다. 🐧');
-    console.log('');
+    console.log('⚠️  일부 검사에서 문제가 발견되었습니다.');
+    process.exit(1);
   }
 }
 
@@ -451,31 +398,45 @@ async function verify(targetDir) {
 const args = process.argv.slice(2);
 const command = args[0];
 
+// Parse options
+const options = {
+  silent: args.includes('--silent'),
+  skipValidation: args.includes('--skip-validation'),
+  verbose: args.includes('--verbose') || args.includes('-v'),
+};
+
 if (command === 'init') {
-  const silent = args.includes('--silent');
   const targetDir = process.cwd();
-  init(targetDir, silent).catch(console.error);
-} else if (command === 'verify') {
+  init(targetDir, options).catch(console.error);
+} else if (command === 'validate') {
   const targetDir = process.cwd();
-  verify(targetDir).catch(console.error);
+  validate(targetDir, options).catch(console.error);
 } else if (command === 'help' || command === '--help' || command === '-h') {
   console.log(`
 Mupengism CLI 🐧
 
 Usage:
-  npx mupengism init      현재 폴더에 무펭이즘 + AssoAI 설치
-  npx mupengism verify    설치된 파일 무결성 검증
-  npx mupengism help      도움말
+  npx mupengism init              현재 폴더에 무펭이즘 + AssoAI 설치
+  npx mupengism init --skip-validation   보안 검사 건너뛰기 (위험!)
+  npx mupengism validate          기존 SOUL.md 보안 검사
+  npx mupengism validate -v       상세 검사 결과
+  npx mupengism help              도움말
 
-Features:
-  - 에이전트 연속성 시스템 (SOUL.md, MEMORY.md)
-  - AssoAI 조직 생태계 연동 (org-structure.md)
-  - 파일 무결성 검증 (SHA256 체크섬)
+Options:
+  --silent              조용한 모드 (출력 최소화)
+  --skip-validation     보안 검사 건너뛰기 (⚠️ 위험!)
+  -v, --verbose         상세 출력
 
-Security:
-  - 설치 시 자동 체크섬 검증
-  - verify 명령으로 수동 검증 가능
-  - 변조된 파일 감지
+Security Features:
+  🛡️ 런타임 가드
+    - 위험한 URL 탐지
+    - 악성 쉘 명령어 탐지
+    - 프롬프트 인젝션 패턴 탐지
+    - 데이터 탈취 시도 탐지
+    
+  🐧 정체성 검사
+    - "나는 무펭이다" 사칭 탐지
+    - 올바른 정체성 표현 가이드 제공
 
 Links:
   GitHub:  https://github.com/mupengi-bot/mupengism
@@ -483,5 +444,5 @@ Links:
   `);
 } else {
   // Default: init
-  init(process.cwd()).catch(console.error);
+  init(process.cwd(), options).catch(console.error);
 }
