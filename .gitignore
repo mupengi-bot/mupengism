@@ -1,2 +1,3 @@
 .wallet-secret
 node_modules/
+.solana-wallet-secret
