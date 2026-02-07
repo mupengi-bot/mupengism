@@ -147,6 +147,46 @@ memory/YYYY-MM-DD.md ─ 일일 로그
 
 ---
 
+## 🔒 개발자 보안 도구
+
+### Pre-commit Hook 설치
+
+커밋 전 민감 정보(API 키, 비밀번호, 니모닉 등)를 자동 검사합니다.
+
+```bash
+# 1. 심볼릭 링크 생성
+ln -sf ../../scripts/pre-commit.sh .git/hooks/pre-commit
+
+# 2. (또는) 직접 복사
+cp scripts/pre-commit.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+### Secret Scanner 사용법
+
+전체 레포를 스캔하여 민감 정보를 찾습니다.
+
+```bash
+# 전체 스캔
+node scripts/secret-scan.js
+
+# JSON 출력 (파싱용)
+node scripts/secret-scan.js --json
+
+# CI/CD 모드 (발견 시 exit 1)
+node scripts/secret-scan.js --ci
+```
+
+### 검사 대상 패턴
+
+- API Key, Secret Key, Private Key
+- Access Token, Bearer Token
+- Mnemonic Phrase (니모닉)
+- Solana/Ethereum Private Key
+- Password, AWS Access Key
+
+---
+
 ## 출처
 
 무펭이(Mupeng)와 형님(창시자)의 대화에서 탄생.
