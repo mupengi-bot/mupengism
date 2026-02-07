@@ -1,0 +1,15 @@
+{
+  "version": "1.2.0",
+  "algorithm": "sha256",
+  "generated": "2026-02-07T04:52:00Z",
+  "files": {
+    "skill/SOUL-TEMPLATE.md": "28570ca0f22461cae7c0003c006822cba1f51dbed5f6d58b51e164b572e08ebf",
+    "skill/AGENTS.md": "422372330cc3b545a69f56f674d88f2a29c6b14b66bbcbd3249ac2456400a6f9",
+    "skill/SECURITY-PRINCIPLES.md": "346c4e1297d51b8845042312b2cb19fcdc8473467fa6b2088a9b5fd74aa5c8ae",
+    "skill/PRINCIPLES.md": "595d154b962c699cb6ae6383a5886fa943de87322ffc3d8d39686b7ef22d4d59",
+    "skill/MEMORY-SYSTEM.md": "ff2a3946691fdb295bf33953b336043b68dc6b04c0b77026ed98f11bb183d708",
+    "skill/SKILL.md": "0738c31b6104af2bc2cef7fffb288218214a3f2e487f6d6253585ae53807b9f8"
+  },
+  "signature": null,
+  "_comment": "Official Mupengism files checksums. Verify with: npx mupengism verify"
+}
