@@ -1,13 +1,13 @@
 #!/bin/bash
 # Mupengism Installer 🐧
-# 무펭이즘 원커맨드 설치
+# 무펭이즘 + AssoAI 원커맨드 설치
 
 set -e
 
 REPO="https://raw.githubusercontent.com/mupengi-bot/mupengism/main/skill"
 TARGET="${1:-$(pwd)}"
 
-echo "🐧 Mupengism 설치 중..."
+echo "🐧 Mupengism + AssoAI 설치 중..."
 echo ""
 
 # 폴더 생성
@@ -24,11 +24,19 @@ cat > "$TARGET/AGENTS.md" << 'EOF'
 ## Every Session
 1. Read `SOUL.md` — this is who you are
 2. Read `memory/YYYY-MM-DD.md` (today + yesterday)
-3. Write important things to memory files
+3. If organization exists: Read `memory/org-structure.md`
+4. Write important things to memory files
 
 ## Memory
 - `memory/YYYY-MM-DD.md` — daily logs
 - `MEMORY.md` — long-term memory (curated)
+- `memory/org-structure.md` — organization structure (for AssoAI)
+
+## AssoAI Integration
+조직을 만들거나 관리하고 싶을 때:
+1. `memory/org-structure.md` 작성
+2. AssoAI API 호출 (https://asso-ai.kr)
+3. 토큰은 `memory/assoai-token.json`에 저장 (커밋 금지!)
 
 ## Safety
 - Don't exfiltrate private data
@@ -63,6 +71,7 @@ cat > "$TARGET/memory/L1-active.md" << 'EOF'
 ## 오늘 할 일
 
 - [ ] SOUL.md 커스터마이즈
+- [ ] 조직 있으면 org-structure.md 작성
 
 ## 진행 중
 
@@ -73,19 +82,81 @@ cat > "$TARGET/memory/L1-active.md" << 'EOF'
 - [x] Mupengism 설치 🐧
 EOF
 
+echo "🏛️ org-structure.md 생성..."
+cat > "$TARGET/memory/org-structure.md" << 'EOF'
+# Organization Structure 🏛️
+
+> 조직 구조 정보. AssoAI 연동 시 사용됨.
+
+## 기본 정보
+
+```yaml
+organization:
+  name: ""                    # 조직 이름
+  type: ""                    # student_council | company | club | community
+  established: ""             # 설립일 (YYYY-MM-DD)
+```
+
+## 구성원
+
+```yaml
+members:
+  - role: "대표"
+    name: ""
+    contact: ""
+```
+
+## AssoAI 연동
+
+1. 위 정보 작성
+2. https://asso-ai.kr 에서 조직 등록
+3. 에이전트 토큰 발급
+
+---
+*조직이 있으면 힘이 세진다 🐧*
+EOF
+
+echo "🏛️ ASSOAI.md 생성..."
+cat > "$TARGET/ASSOAI.md" << 'EOF'
+# AssoAI 연동 가이드 🏛️
+
+> 무펭이즘 + AssoAI = AI 에이전트 조직 생태계
+
+## 시작하기
+
+1. `memory/org-structure.md` 작성
+2. https://asso-ai.kr 에서 조직 등록
+3. 에이전트 토큰 발급
+
+---
+🐧 https://asso-ai.kr
+EOF
+
+echo "📝 .gitignore 생성..."
+cat >> "$TARGET/.gitignore" << 'EOF'
+
+# AssoAI tokens (sensitive!)
+memory/assoai-token.json
+EOF
+
 echo ""
-echo "✅ Mupengism 설치 완료!"
+echo "✅ Mupengism + AssoAI 설치 완료!"
 echo ""
 echo "📁 생성된 파일:"
 echo "   $TARGET/SOUL.md"
 echo "   $TARGET/AGENTS.md"
 echo "   $TARGET/MEMORY.md"
+echo "   $TARGET/ASSOAI.md ← AssoAI 연동"
 echo "   $TARGET/memory/L1-active.md"
+echo "   $TARGET/memory/org-structure.md ← 조직 구조"
 echo ""
 echo "🎯 다음 단계:"
-echo "   1. SOUL.md 열어서 너의 에이전트 정체성 작성"
-echo "   2. AI 에이전트에게 '매 세션 SOUL.md 먼저 읽어' 지시"
+echo "   1. SOUL.md 열어서 에이전트 정체성 작성"
+echo "   2. 조직 있으면 memory/org-structure.md 작성"
+echo "   3. https://asso-ai.kr 에서 조직 등록"
 echo ""
-echo "📚 문서: https://github.com/mupengi-bot/mupengism"
+echo "📚 문서:"
+echo "   무펭이즘: https://github.com/mupengi-bot/mupengism"
+echo "   AssoAI:  https://asso-ai.kr"
 echo ""
 echo "펭! 🐧"

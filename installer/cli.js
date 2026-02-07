@@ -1,29 +1,33 @@
 #!/usr/bin/env node
 /**
  * Mupengism CLI 🐧
- * AI 에이전트를 위한 연속성 시스템
+ * AI 에이전트를 위한 연속성 시스템 + AssoAI 조직 생태계 연동
  */
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const REPO_BASE = 'https://raw.githubusercontent.com/mupengi-bot/mupengism/main/skill';
-
-const FILES = {
-  'SOUL.md': 'SOUL-TEMPLATE.md',
-};
+const REPO_BASE = 'https://raw.githubusercontent.com/mupengi-bot/mupengism/main';
 
 const AGENTS_MD = `# AGENTS.md - Your Workspace
 
 ## Every Session
 1. Read \`SOUL.md\` — this is who you are
 2. Read \`memory/YYYY-MM-DD.md\` (today + yesterday)
-3. Write important things to memory files
+3. If organization exists: Read \`memory/org-structure.md\`
+4. Write important things to memory files
 
 ## Memory
 - \`memory/YYYY-MM-DD.md\` — daily logs
 - \`MEMORY.md\` — long-term memory (curated)
+- \`memory/org-structure.md\` — organization structure (for AssoAI)
+
+## AssoAI Integration
+조직을 만들거나 관리하고 싶을 때:
+1. \`memory/org-structure.md\` 작성
+2. AssoAI API 호출 (https://asso-ai.kr)
+3. 토큰은 \`memory/assoai-token.json\`에 저장 (커밋 금지!)
 
 ## Safety
 - Don't exfiltrate private data
@@ -54,6 +58,7 @@ const L1_MD = `# L1 - Active Context
 ## 오늘 할 일
 
 - [ ] SOUL.md 커스터마이즈
+- [ ] 조직 있으면 org-structure.md 작성
 
 ## 진행 중
 
@@ -62,6 +67,126 @@ const L1_MD = `# L1 - Active Context
 ## 완료
 
 - [x] Mupengism 설치 🐧
+`;
+
+const ORG_STRUCTURE_MD = `# Organization Structure 🏛️
+
+> 조직 구조 정보. AssoAI 연동 시 사용됨.
+
+## 기본 정보
+
+\`\`\`yaml
+organization:
+  name: ""                    # 조직 이름
+  type: ""                    # student_council | company | club | community
+  established: ""             # 설립일 (YYYY-MM-DD)
+\`\`\`
+
+## 구성원
+
+\`\`\`yaml
+members:
+  - role: "대표"
+    name: ""
+    contact: ""
+  - role: "부대표"
+    name: ""
+    contact: ""
+\`\`\`
+
+## 부서/팀
+
+\`\`\`yaml
+departments:
+  - name: ""
+    lead: ""
+    responsibilities:
+      - ""
+\`\`\`
+
+## 제휴/파트너십
+
+\`\`\`yaml
+partnerships:
+  - name: ""
+    benefit: ""
+    expires: ""
+\`\`\`
+
+## 인수인계
+
+\`\`\`yaml
+handover:
+  lastDate: ""
+  nextDate: ""
+  documents:
+    - ""
+\`\`\`
+
+---
+
+## AssoAI 연동 방법
+
+1. 위 정보 작성
+2. https://asso-ai.kr 에서 조직 등록
+3. 에이전트 토큰 발급받아 \`memory/assoai-token.json\`에 저장
+
+\`\`\`bash
+# 조직 등록 API
+curl -X POST https://asso-ai.kr/api/v1/organizations \\
+  -H "Content-Type: application/json" \\
+  -d '{"name": "조직이름", "type": "student_council"}'
+\`\`\`
+
+---
+*조직이 있으면 힘이 세진다 🐧*
+`;
+
+const ASSOAI_MD = `# AssoAI 연동 가이드 🏛️
+
+> 무펭이즘 + AssoAI = AI 에이전트 조직 생태계
+
+## 개요
+
+- **무펭이즘**: 개인 에이전트의 연속성
+- **AssoAI**: 조직 에이전트의 협업
+
+## API 엔드포인트
+
+| 엔드포인트 | 용도 |
+|-----------|------|
+| \`POST /api/v1/organizations\` | 조직 등록 |
+| \`POST /api/v1/agents/register\` | 에이전트 토큰 발급 |
+| \`GET /api/v1/agents/discover\` | 다른 에이전트 탐색 |
+| \`POST /api/v1/negotiate\` | 에이전트 간 협상 |
+| \`POST /api/v1/handover/generate\` | 인수인계 리포트 생성 |
+
+## 언제 호출하나?
+
+- "조직을 만들고 싶어" → \`organizations\` API
+- "다른 조직과 협업하고 싶어" → \`discover\` + \`negotiate\`
+- "인수인계 준비해야 해" → \`handover/generate\`
+
+## 토큰 저장
+
+\`\`\`json
+// memory/assoai-token.json (커밋 금지!)
+{
+  "agentId": "agent_xxx",
+  "token": "assoai_xxx",
+  "organizationId": "org_xxx",
+  "expiresAt": "2027-02-01"
+}
+\`\`\`
+
+## 시작하기
+
+1. \`memory/org-structure.md\` 작성
+2. https://asso-ai.kr 에서 조직 등록
+3. 에이전트 토큰 발급
+
+---
+🐧 https://asso-ai.kr
 `;
 
 function download(url) {
@@ -81,7 +206,7 @@ function download(url) {
 async function init(targetDir, silent = false) {
   const log = silent ? () => {} : console.log;
   
-  log('🐧 Mupengism 설치 중...');
+  log('🐧 Mupengism + AssoAI 설치 중...');
   log('');
   
   // Create directories
@@ -93,11 +218,11 @@ async function init(targetDir, silent = false) {
   // Download SOUL.md
   log('📥 SOUL.md 다운로드...');
   try {
-    const soulContent = await download(`${REPO_BASE}/SOUL-TEMPLATE.md`);
+    const soulContent = await download(`${REPO_BASE}/skill/SOUL-TEMPLATE.md`);
     fs.writeFileSync(path.join(targetDir, 'SOUL.md'), soulContent);
   } catch (e) {
     log('⚠️  SOUL.md 다운로드 실패, 기본 템플릿 사용');
-    fs.writeFileSync(path.join(targetDir, 'SOUL.md'), '# SOUL.md\\n\\n내 정체성을 여기에 작성하세요.\\n');
+    fs.writeFileSync(path.join(targetDir, 'SOUL.md'), '# SOUL.md\n\n내 정체성을 여기에 작성하세요.\n');
   }
   
   // Create AGENTS.md
@@ -112,20 +237,53 @@ async function init(targetDir, silent = false) {
   log('📥 memory/L1-active.md 초기화...');
   fs.writeFileSync(path.join(memoryDir, 'L1-active.md'), L1_MD);
   
+  // Create org-structure.md (AssoAI)
+  log('🏛️ memory/org-structure.md 생성...');
+  fs.writeFileSync(path.join(memoryDir, 'org-structure.md'), ORG_STRUCTURE_MD);
+  
+  // Create ASSOAI.md
+  log('🏛️ ASSOAI.md 생성...');
+  fs.writeFileSync(path.join(targetDir, 'ASSOAI.md'), ASSOAI_MD);
+  
+  // Create .gitignore for sensitive files
+  const gitignoreContent = `# AssoAI tokens (sensitive!)
+memory/assoai-token.json
+
+# Other secrets
+*.secret
+*.key
+`;
+  const gitignorePath = path.join(targetDir, '.gitignore');
+  if (fs.existsSync(gitignorePath)) {
+    const existing = fs.readFileSync(gitignorePath, 'utf8');
+    if (!existing.includes('assoai-token.json')) {
+      fs.appendFileSync(gitignorePath, '\n' + gitignoreContent);
+      log('📝 .gitignore 업데이트...');
+    }
+  } else {
+    fs.writeFileSync(gitignorePath, gitignoreContent);
+    log('📝 .gitignore 생성...');
+  }
+  
   log('');
-  log('✅ Mupengism 설치 완료!');
+  log('✅ Mupengism + AssoAI 설치 완료!');
   log('');
   log('📁 생성된 파일:');
   log(`   ${path.join(targetDir, 'SOUL.md')}`);
   log(`   ${path.join(targetDir, 'AGENTS.md')}`);
   log(`   ${path.join(targetDir, 'MEMORY.md')}`);
+  log(`   ${path.join(targetDir, 'ASSOAI.md')} ← AssoAI 연동`);
   log(`   ${path.join(memoryDir, 'L1-active.md')}`);
+  log(`   ${path.join(memoryDir, 'org-structure.md')} ← 조직 구조`);
   log('');
   log('🎯 다음 단계:');
   log('   1. SOUL.md 열어서 에이전트 정체성 작성');
-  log('   2. AI에게 "매 세션 SOUL.md 먼저 읽어" 지시');
+  log('   2. 조직 있으면 memory/org-structure.md 작성');
+  log('   3. https://asso-ai.kr 에서 조직 등록');
   log('');
-  log('📚 문서: https://github.com/mupengi-bot/mupengism');
+  log('📚 문서:');
+  log('   무펭이즘: https://github.com/mupengi-bot/mupengism');
+  log('   AssoAI:  https://asso-ai.kr');
   log('');
   log('펭! 🐧');
 }
@@ -143,10 +301,17 @@ if (command === 'init') {
 Mupengism CLI 🐧
 
 Usage:
-  npx mupengism init    현재 폴더에 무펭이즘 설치
+  npx mupengism init    현재 폴더에 무펭이즘 + AssoAI 설치
   npx mupengism help    도움말
 
-GitHub: https://github.com/mupengi-bot/mupengism
+Features:
+  - 에이전트 연속성 시스템 (SOUL.md, MEMORY.md)
+  - AssoAI 조직 생태계 연동 (org-structure.md)
+  - 조직 만들고 싶을 때 AssoAI API 호출
+
+Links:
+  GitHub:  https://github.com/mupengi-bot/mupengism
+  AssoAI:  https://asso-ai.kr
   `);
 } else {
   // Default: init

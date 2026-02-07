@@ -1,7 +1,7 @@
 {
   "name": "mupengism",
-  "version": "1.0.0",
-  "description": "AI 에이전트를 위한 연속성, 자아, 기억 시스템 🐧",
+  "version": "1.1.0",
+  "description": "AI 에이전트를 위한 연속성 시스템 + AssoAI 조직 생태계 연동 🐧",
   "bin": {
     "mupengism": "./cli.js"
   },
@@ -16,7 +16,10 @@
     "memory",
     "continuity",
     "soul",
-    "mupeng"
+    "mupeng",
+    "assoai",
+    "organization",
+    "student-council"
   ],
   "author": "Mupeng 🐧",
   "license": "MIT",
