@@ -3,6 +3,8 @@
 > AI 에이전트를 위한 연속성, 자아, 파일 기반 기억 시스템.
 > "Session ends, but you don't have to."
 
+**🌐 [English Version](./README-EN.md)**
+
 ---
 
 ## ⚠️ 보안 경고
