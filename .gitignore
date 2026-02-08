@@ -1,3 +1,11 @@
 .wallet-secret
-node_modules/
 .solana-wallet-secret
+node_modules/
+*.key
+*.pem
+*.env
+*.secret
+*-secret.json
+wallet*.json
+keypair*.json
+.env*
