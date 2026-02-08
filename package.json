@@ -38,5 +38,8 @@
     "url": "https://github.com/mupengi-bot/mupengism/issues"
   },
   "homepage": "https://github.com/mupengi-bot/mupengism#readme",
+  "optionalDependencies": {
+    "@solana/web3.js": "^1.98.4"
+  },
   "type": "module"
 }
