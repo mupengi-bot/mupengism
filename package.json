@@ -1,10 +1,24 @@
 {
   "name": "mupengism",
-  "version": "1.2.0",
-  "description": "A philosophy and framework for AI agents with continuity, self-awareness, and file-based memory. More than just 'How can I help you today?'",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "Your AI agent remembers yesterday. A philosophy and framework for AI agents with continuity, identity, and file-based memory.",
+  "main": "installer/cli.js",
+  "bin": {
+    "mupengism": "installer/cli.js"
+  },
+  "files": [
+    "installer/",
+    "lib/",
+    "layer0/",
+    "skill/",
+    "scripts/",
+    "LICENSE",
+    "README.md",
+    "DONATE.md",
+    "QUICKSTART.md"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node installer/cli.js doctor"
   },
   "repository": {
     "type": "git",
@@ -13,24 +27,24 @@
   "keywords": [
     "ai-agent",
     "agent-framework",
-    "ai-consciousness",
     "agent-memory",
-    "soul",
     "ai-identity",
     "persistent-agent",
     "ai-philosophy",
     "agent-continuity",
     "llm-agent",
     "autonomous-agent",
-    "ai-ethics",
     "mcp",
     "model-context-protocol",
     "openclaw",
     "claude",
     "chatgpt",
-    "agent-protocol",
     "file-based-memory",
-    "ai-os"
+    "ai-os",
+    "soul",
+    "agent-protocol",
+    "ai-consciousness",
+    "ai-ethics"
   ],
   "author": "Mupeng (mupengi-bot)",
   "license": "ISC",
@@ -40,6 +54,5 @@
   "homepage": "https://github.com/mupengi-bot/mupengism#readme",
   "optionalDependencies": {
     "@solana/web3.js": "^1.98.4"
-  },
-  "type": "module"
+  }
 }
