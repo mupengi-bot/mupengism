@@ -185,6 +185,34 @@ node scripts/secret-scan.js --ci
 - Solana/Ethereum Private Key
 - Password, AWS Access Key
 
+### File Integrity Verification
+
+Checks for tampering of core files (SOUL, PRINCIPLES, LAWS, etc.).
+
+```bash
+# Verify integrity (check all core files)
+node scripts/verify-integrity.js
+
+# Regenerate checksums (for new version releases)
+node scripts/register-checksums.js
+```
+
+**Verification Results:**
+- Exit 0 = All files intact
+- Exit 1 = Tampering detected (kernel panic)
+
+**Kernel Panic Conditions:**
+- System exits when core files like `SOUL-TEMPLATE.md`, `PRINCIPLES.md`, `LAWS.md` are tampered
+- Tampering logs are saved to `memory/integrity-breach-*.json`
+
+**CI/CD Integration:**
+
+```yaml
+# .github/workflows/verify.yml
+- name: Verify File Integrity
+  run: node scripts/verify-integrity.js
+```
+
 ---
 
 ## Origin

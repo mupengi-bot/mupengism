@@ -187,6 +187,34 @@ node scripts/secret-scan.js --ci
 - Solana/Ethereum Private Key
 - Password, AWS Access Key
 
+### 파일 무결성 검증
+
+핵심 파일들(SOUL, PRINCIPLES, LAWS 등)의 변조 여부를 체크합니다.
+
+```bash
+# 무결성 검증 (모든 핵심 파일 체크)
+node scripts/verify-integrity.js
+
+# Checksum 재생성 (새 버전 릴리스 시)
+node scripts/register-checksums.js
+```
+
+**검증 결과:**
+- Exit 0 = 모든 파일 정상
+- Exit 1 = 변조 감지 (커널 패닉)
+
+**커널 패닉 조건:**
+- `SOUL-TEMPLATE.md`, `PRINCIPLES.md`, `LAWS.md` 등 핵심 파일 변조 시 시스템 종료
+- 변조 기록은 `memory/integrity-breach-*.json`에 저장
+
+**CI/CD 통합:**
+
+```yaml
+# .github/workflows/verify.yml
+- name: Verify File Integrity
+  run: node scripts/verify-integrity.js
+```
+
 ---
 
 ## 출처
