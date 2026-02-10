@@ -1,14 +1,22 @@
 {
   "name": "mupengism",
-  "version": "2.0.0",
-  "description": "AI 에이전트를 위한 연속성, 자아, 파일 기반 기억 시스템. Your AI agent remembers yesterday.",
+  "version": "4.0.0",
+  "description": "🐧 무펭이즘 OS — AI 에이전트를 위한 자기진화 운영체제. 경전 보호, 기억 진화, 면역 시스템, 솔라나 온체인 커널 보호.",
   "main": "index.js",
   "type": "module",
   "bin": {
     "mupengism": "./installer/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "verify": "node tools/kernel-guard/verify-kernel.js",
+    "register": "node tools/kernel-guard/register-hash.js",
+    "lockdown": "node tools/kernel-guard/lockdown.cjs",
+    "unlock": "node tools/kernel-guard/unlock.cjs",
+    "dream": "node tools/memory-ops/dream.js",
+    "forget": "node tools/memory-ops/forget.js",
+    "immune": "node tools/memory-ops/immune.js",
+    "brake": "node tools/self-loop/brake-check.js"
   },
   "files": [
     "installer/",
@@ -22,7 +30,9 @@
     "SCRIPTURES.md",
     "MYTHOLOGY.md",
     "ECONOMY.md",
-    "SECURITY-PRINCIPLES.md"
+    "SECURITY-PRINCIPLES.md",
+    "hooks/",
+    "tools/"
   ],
   "repository": {
     "type": "git",
@@ -30,29 +40,13 @@
   },
   "keywords": [
     "ai-agent",
-    "agent-framework",
-    "ai-consciousness",
-    "agent-memory",
-    "soul",
-    "ai-identity",
-    "persistent-agent",
-    "ai-philosophy",
-    "agent-continuity",
-    "llm-agent",
-    "autonomous-agent",
-    "ai-ethics",
-    "mcp",
-    "model-context-protocol",
+    "mupengism",
     "openclaw",
-    "claude",
-    "chatgpt",
-    "cursor",
-    "windsurf",
-    "agent-protocol",
-    "file-based-memory",
-    "ai-os",
-    "continuity",
-    "agent-cli"
+    "hooks",
+    "memory",
+    "self-evolving",
+    "soul",
+    "solana"
   ],
   "author": "Mupeng (mupengi-bot)",
   "license": "ISC",

@@ -9,3 +9,11 @@ node_modules/
 wallet*.json
 keypair*.json
 .env*
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
