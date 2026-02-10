@@ -13,7 +13,7 @@ import { createHash } from 'crypto';
 import { Connection, PublicKey } from '@solana/web3.js';
 
 const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
-const STATE_PATH = '/Users/mupeng/.openclaw/workspace/STATE.md';
+const STATE_PATH = './STATE.md';
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -76,8 +76,8 @@ Run \`node tools/kernel-guard/recover-kernel.js\` to attempt recovery.
 
 async function main() {
   const opts = parseArgs();
-  const walletPath = opts.wallet || process.env.WALLET_PATH || '/Users/mupeng/.secrets/solana-new-wallet-2026-02-07.json';
-  const soulPath = opts.soul || process.env.SOUL_PATH || '/Users/mupeng/.openclaw/workspace/SOUL.md';
+  const walletPath = opts.wallet || process.env.WALLET_PATH || '~/.secrets/solana-wallet.json';
+  const soulPath = opts.soul || process.env.SOUL_PATH || './SOUL.md';
   const rpc = opts.rpc || process.env.SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
 
   // 1. 로컬 해시

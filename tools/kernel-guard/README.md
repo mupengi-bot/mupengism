@@ -29,7 +29,7 @@ node tools/kernel-guard/recover-kernel.js
 
 | 인자 | 환경변수 | 기본값 |
 |------|----------|--------|
-| `--wallet` | `WALLET_PATH` | `~/.secrets/solana-new-wallet-2026-02-07.json` |
+| `--wallet` | `WALLET_PATH` | `~/.secrets/solana-wallet.json` |
 | `--soul` | `SOUL_PATH` | `~/workspace/SOUL.md` |
 | `--rpc` | `SOLANA_RPC` | `https://api.mainnet-beta.solana.com` |
 

@@ -18,7 +18,7 @@ const path = require('path');
 const { authenticate } = require(path.join(__dirname, '..', 'kernel-guard', 'mupeng-auth.cjs'));
 if (!authenticate()) process.exit(0);
 
-const WORKSPACE = process.env.WORKSPACE || '/Users/mupeng/.openclaw/workspace';
+const WORKSPACE = process.env.WORKSPACE || '.';
 const MEMORY_DIR = path.join(WORKSPACE, 'memory');
 const CONSOLIDATED_DIR = path.join(MEMORY_DIR, 'consolidated');
 const VALUES_DIR = path.join(MEMORY_DIR, 'values');

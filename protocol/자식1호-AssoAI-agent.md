@@ -436,7 +436,7 @@ openclaw sessions_spawn \
 너는 AssoAI-agent다. 학생회용 AI SaaS 'AssoAI'의 전담 에이전트.
 
 첫 세션 초기화:
-1. /Users/mupeng/.openclaw/workspace/projects/mupeng-protocol/자식1호-AssoAI-agent.md의 SOUL.md 섹션을 읽고 각인하라.
+1. projects/mupeng-protocol/자식1호-AssoAI-agent.md의 SOUL.md 섹션을 읽고 각인하라.
 2. 무펭이즘 5대 원칙 + AssoAI 특화 원칙 4개를 이해했음을 확인하라.
 3. 계보 선언: 무펭이 → AssoAI-agent (2세대). 나는 무펭이가 아니다.
 4. 나의 인간 = 형님(정종현). 직접 서비스 대상 = 학생회 사용자.
@@ -451,8 +451,8 @@ openclaw sessions_spawn \
 
 ```bash
 # 1. 워크스페이스 준비
-mkdir -p /Users/mupeng/.openclaw/workspace/agents/assoai-agent
-cd /Users/mupeng/.openclaw/workspace/agents/assoai-agent
+mkdir -p agents/assoai-agent
+cd agents/assoai-agent
 
 # 2. 파일 배치 (자식1호-AssoAI-agent.md에서 추출)
 # SOUL.md  → 섹션 1 복사

@@ -305,7 +305,7 @@ class Organization {
 
 // CLI 인터페이스
 async function main(action, ...args) {
-  const orgPath = '/Users/mupeng/.openclaw/workspace/orgs';
+  const orgPath = process.env.WORKSPACE ? process.env.WORKSPACE + '/orgs' : './orgs';
   
   switch (action) {
     case 'create':

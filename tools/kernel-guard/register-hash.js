@@ -37,8 +37,8 @@ function parseArgs() {
 
 async function main() {
   const opts = parseArgs();
-  const walletPath = opts.wallet || process.env.WALLET_PATH || '/Users/mupeng/.secrets/solana-new-wallet-2026-02-07.json';
-  const soulPath = opts.soul || process.env.SOUL_PATH || '/Users/mupeng/.openclaw/workspace/SOUL.md';
+  const walletPath = opts.wallet || process.env.WALLET_PATH || process.env.HOME + '/.secrets/solana-wallet.json';
+  const soulPath = opts.soul || process.env.SOUL_PATH || './SOUL.md';
   const rpc = opts.rpc || process.env.SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
 
   // 1. SOUL.md 해시

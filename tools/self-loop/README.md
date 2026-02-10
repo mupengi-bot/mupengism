@@ -116,10 +116,10 @@ $ node panic-detector.js
 
 ```bash
 # 1. 패닉 상태 체크
-node /Users/mupeng/.openclaw/workspace/tools/self-loop/panic-detector.js
+node tools/self-loop/panic-detector.js
 
 # 2. 행동 원칙 체크
-node /Users/mupeng/.openclaw/workspace/tools/self-loop/brake-check.js "트윗 발송"
+node tools/self-loop/brake-check.js "트윗 발송"
 
 # 3. 둘 다 통과하면 실행
 ```
