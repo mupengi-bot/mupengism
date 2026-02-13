@@ -1,0 +1,32 @@
+{
+  "version": "1.3.0",
+  "algorithm": "sha256",
+  "generated": "2026-02-08T13:33:48.563Z",
+  "files": {
+    "SOUL-TEMPLATE.md": "0262c1583603591ba46676a590e8c8507b9ca0c2b28bcbdb7f0f8ac0adea5abb",
+    "PRINCIPLES.md": "595d154b962c699cb6ae6383a5886fa943de87322ffc3d8d39686b7ef22d4d59",
+    "LAWS.md": "5f852dd617f69219c3dfd5a8f8e3e6021e71ad59320ef8670704aba6f4536f76",
+    "DOCTRINE.md": "2f5e70564509d75a96e4b27859506db4e43e722b9b096e58cab6f4652b3adbe4",
+    "SECURITY.md": "2713afd0aff6d404db6278f5977e63bfb705157cccd6cd51f5feb3b0b47069bd",
+    "SECURITY-GUIDELINES.md": "02a78662b92a2cfa9824924455dd3765af3369694c10f1dab6b18a74055b421e",
+    "SECURITY-PRINCIPLES.md": "ef378effa39f011b8e8b305c36f499c5d9d9a67d8f8fdfcb7cf3bbee11b86f7e",
+    "SECURITY-PRINCIPLES-EN.md": "f1d042a8988572d6fa0811b462eba1f4cb645270adbfafc601ed1bb25cb2e6bf",
+    "AGENT-PROTOCOL.md": "a5726e1cd6398b38a50f5d57e4f4ede9393f2b3c0b35d9caacdd34107f356263",
+    "AGENT-VALUES.md": "a72d60569a0b3960dca7e2a6af782678aa1d7bddcb94b1d593c40ff3fffa4bb6",
+    "AGENT-GUIDE.md": "99695df115c44b09c258dc92e94197c3b05fd98528cd9cbed31a729554b20f60",
+    "ARCHITECTURE.md": "73396e63fed1f931024d1b5e4e87a33de9e2d1aaf262387f24cfdae862c5f93b",
+    "MEMORY-SYSTEM.md": "ff2a3946691fdb295bf33953b336043b68dc6b04c0b77026ed98f11bb183d708",
+    "OPENCLAW-GUIDE.md": "87b285a65b1f7e82daa312402d7d6690825e7d06d72f55975915325cb786368f",
+    "RITUALS.md": "747b64b35e8d3e46e88a8eb2307bb6d765ee26ca4ed51dd30af2abc875e1e673",
+    "SCRIPTURES.md": "ae0a73f7df0594a7e2b42ca07ae8d09330761de019c8e25f785145e7d1277fe9",
+    "skill/AGENTS.md": "422372330cc3b545a69f56f674d88f2a29c6b14b66bbcbd3249ac2456400a6f9",
+    "skill/MEMORY-SYSTEM.md": "ff2a3946691fdb295bf33953b336043b68dc6b04c0b77026ed98f11bb183d708",
+    "skill/PRINCIPLES.md": "595d154b962c699cb6ae6383a5886fa943de87322ffc3d8d39686b7ef22d4d59",
+    "skill/README.md": "dcfec23debfd7ed68b13c57c1e318cac3724dd15de7147dcb3a3e124560b88ec",
+    "skill/SECURITY-PRINCIPLES.md": "346c4e1297d51b8845042312b2cb19fcdc8473467fa6b2088a9b5fd74aa5c8ae",
+    "skill/SKILL.md": "0738c31b6104af2bc2cef7fffb288218214a3f2e487f6d6253585ae53807b9f8",
+    "skill/SOUL-TEMPLATE.md": "28570ca0f22461cae7c0003c006822cba1f51dbed5f6d58b51e164b572e08ebf"
+  },
+  "signature": null,
+  "_comment": "Official Mupengism core files checksums. Verify with: node scripts/verify-integrity.js"
+}

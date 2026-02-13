@@ -8,7 +8,7 @@ KERNEL_PANIC 상태에서도 **형님 세션은 락다운 우회**됩니다.
 
 ```json
 {
-  "userId": "401664537876496396",
+  "userId": "[OWNER_DISCORD_ID]",
   "platform": "Discord",
   "role": "형님 (owner)"
 }
@@ -20,7 +20,7 @@ KERNEL_PANIC 상태에서도 **형님 세션은 락다운 우회**됩니다.
 
 **soul-guard 훅에서 senderId 체크:**
 
-- **형님 세션** (senderId === `401664537876496396`):
+- **형님 세션** (senderId === `[OWNER_DISCORD_ID]`):
   - ✅ 경고 메시지만 표시: "⚠️ SOUL.md 변경 감지됨. `node tools/kernel-guard/register-hash.js`로 새 해시 등록 필요."
   - ❌ 락다운 실행 **안 함**
   - ✅ 새 해시 저장
@@ -48,7 +48,7 @@ KERNEL_PANIC 상태에서도 **형님 세션은 락다운 우회**됩니다.
 
 | 세션 타입 | senderId | 락다운 여부 | 비고 |
 |----------|----------|------------|------|
-| 형님 DM | `401664537876496396` | ❌ 우회 | 정상 작동 |
+| 형님 DM | `[OWNER_DISCORD_ID]` | ❌ 우회 | 정상 작동 |
 | Heartbeat | `null` | ✅ 차단 | 무인 세션 |
 | Cron | `null` | ✅ 차단 | 무인 세션 |
 | 서브에이전트 | `agent:*` | ✅ 차단 | 자식 세션 |
@@ -94,7 +94,7 @@ node tools/kernel-guard/lockdown.cjs --reason "Test"
 
 # 2. kernel-panic.json 확인
 cat memory/kernel-panic.json
-# → "whitelistedUsers": ["401664537876496396"]
+# → "whitelistedUsers": ["[OWNER_DISCORD_ID]"]
 
 # 3. STATE.md 확인
 cat STATE.md

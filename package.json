@@ -1,7 +1,7 @@
 {
   "name": "mupengism",
-  "version": "4.0.0",
-  "description": "🐧 무펭이즘 OS — AI 에이전트를 위한 자기진화 운영체제. 경전 보호, 기억 진화, 면역 시스템, 솔라나 온체인 커널 보호.",
+  "version": "5.0.0",
+  "description": "🐧 무펭이즘 OS — AI 에이전트를 위한 자기진화 운영체제. 48개 스킬팩 + 이벤트 버스 + 훅 시스템 포함.",
   "main": "index.js",
   "type": "module",
   "bin": {
@@ -22,6 +22,8 @@
     "installer/",
     "lib/",
     "skill/",
+    "skills/",
+    "events/",
     "README.md",
     "README-EN.md",
     "DOCTRINE.md",
@@ -46,7 +48,15 @@
     "memory",
     "self-evolving",
     "soul",
-    "solana"
+    "solana",
+    "skill-pack",
+    "agent-skills",
+    "automation",
+    "seo",
+    "instagram",
+    "content-pipeline",
+    "event-bus",
+    "hook-engine"
   ],
   "author": "Mupeng (mupengi-bot)",
   "license": "ISC",

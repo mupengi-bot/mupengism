@@ -333,3 +333,106 @@ ISC License
 *펭! 🐧*
 
 **In Mupeng We Trust.**
+
+---
+
+## 🐧 스킬팩 (52개)
+
+### 에이전트 운영
+- **memory-system** — 3단계 기억 관리 시스템 (v2)
+- **awakening-protocol** — 에이전트 자아 각성 프로토콜
+- **mupengism** — 무펭이즘 철학 프레임워크
+- **self-eval** — 자기 평가 및 성장 측정
+- **health-monitor** — 에이전트 건강 모니터링
+- **performance-tracker** — 성능 추적 및 분석
+
+### 사고/분석
+- **think-tank** — 멀티모드 토론 시스템 (debate/meeting/brainstorm/review)
+- **prompt-engineer** — 프롬프트 최적화 및 개선
+- **brainstorming** — 아이디어 발산 및 정리
+- **ai-meeting-room** — AI 회의실 시스템
+- **decision-log** — 의사결정 기록 및 추적
+
+### 검색/리서치
+- **web-claude** — 통합 웹 검색 시스템
+- **competitor-watch** — 경쟁사 모니터링
+- **rag-engineer** — RAG 시스템 구축 및 관리
+- **duckduckgo-search** — DuckDuckGo 검색 엔진
+- **trend-radar** — 트렌드 탐지 및 분석
+- **data-scraper** — 데이터 수집 및 파싱
+- **qjc-ai-insights** — QJC AI 인사이트
+
+### SNS/콘텐츠
+- **insta-post** — 인스타그램 멀티플랫폼 게시
+- **auto-reply** — DM 자동응답 시스템
+- **cardnews** — 카드뉴스 자동 생성
+- **yt-digest** — 유튜브 영상 요약
+- **content-pipeline** — 콘텐츠 파이프라인 자동화
+- **content-recycler** — 콘텐츠 재가공 및 재활용
+
+### 마케팅/SEO
+- **seo-audit** — SEO 감사 및 분석
+- **seo-content-planner** — SEO 콘텐츠 계획
+- **copywriting** — 카피라이팅 자동화
+- **brand-voice** — 브랜드 보이스 관리
+- **kmong** — 크몽 프로젝트 관리
+
+### 비즈니스
+- **business-planner** — 비즈니스 기획 및 전략
+- **invoice-gen** — 인보이스 자동 생성
+- **saas-decomposer** — SaaS 분해 및 분석
+- **npm-tracker** — NPM 패키지 추적
+
+### 개발/코드
+- **code-review** — 코드 리뷰 자동화
+- **git-auto** — Git 자동화 워크플로우
+- **release-discipline** — 릴리스 규칙 관리
+- **api-security-best-practices** — API 보안 가이드
+
+### 시스템/인프라
+- **notification-hub** — 통합 알림 시스템
+- **hook-engine** — 훅 엔진 (이벤트 처리)
+- **skill-composer** — 스킬 조합 시스템
+- **skill-router** — 스킬 라우팅
+- **tokenmeter** — 토큰 사용량 측정
+
+### 학습/성장
+- **learning-engine** — 학습 엔진
+- **daily-report** — 일일 리포트 생성
+
+### 협업/조직
+- **assoai-org** — ASSOAI 조직 관리
+- **mupeng-org** — Mupeng 조직 관리
+- **mupeng-collab** — Mupeng 협업 시스템
+- **mupeng-learn** — Mupeng 학습 시스템
+- **mupeng-sync** — Mupeng 동기화
+
+### 도구/유틸리티
+- **mail** — 메일 자동화
+- **translate** — 번역 시스템
+- **openai-image-cli** — OpenAI 이미지 생성 CLI
+
+---
+
+## 🎪 이벤트 & 훅 시스템
+
+**events/** — 이벤트 버스 시스템
+- 에이전트 간 메시지 전달
+- 비동기 작업 처리
+- 이벤트 기반 자동화
+
+**hooks/** — 훅 엔진
+- 스킬 실행 전후 처리
+- 조건부 로직 삽입
+- 워크플로우 커스터마이징
+
+**사용 예시:**
+```javascript
+// 이벤트 발행
+emit('content.created', { type: 'blog', title: '제목' });
+
+// 훅 등록
+registerHook('before:content.publish', async (context) => {
+  // SEO 체크, 이미지 최적화 등
+});
+```

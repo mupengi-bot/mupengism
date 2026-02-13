@@ -11,7 +11,7 @@
 
 1. **agent:bootstrap 이벤트 발생** (세션 시작 시)
 2. **STATE.md 존재 및 내용 확인**
-3. **senderId 체크** (형님 화이트리스트: `401664537876496396`)
+3. **senderId 체크** (형님 화이트리스트: `[OWNER_DISCORD_ID]`)
 4. **"KERNEL_PANIC" 감지 시:**
    - **형님 세션**: 간단한 알림만, 락다운 우회
    - **비형님 세션**: `context.bootstrapFiles`에 `KERNEL_PANIC_WARNING.md` 주입
@@ -25,7 +25,7 @@
 - **서브에이전트**
 - **형님이 아닌 사용자**
 
-**형님 세션 (Discord user id: `401664537876496396`)은 락다운 우회**
+**형님 세션 (Discord user id: `[OWNER_DISCORD_ID]`)은 락다운 우회**
 
 ## 차단 대상 도구 (형님 제외)
 

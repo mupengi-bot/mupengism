@@ -1,0 +1,14 @@
+{
+  "type": "npm-stats",
+  "source": "npm-tracker",
+  "timestamp": "2026-02-13T23:46:03Z",
+  "data": {
+    "package": "openclaw",
+    "period": "last-week",
+    "downloads": 823087,
+    "version": "2026.2.12",
+    "start": "2026-02-06",
+    "end": "2026-02-12"
+  },
+  "consumers": ["daily-report", "notification-hub"]
+}

@@ -15,8 +15,8 @@ export async function handler(event: any): Promise<void> {
     const workspace = event.workspace || process.cwd();
     const statePath = path.join(workspace, 'STATE.md');
     
-    // 형님 화이트리스트
-    const HYUNGNIM_USER_ID = '401664537876496396';
+    // 형님 화이트리스트 (환경변수 우선, 하드코딩 제거)
+    const HYUNGNIM_USER_ID = process.env.OWNER_DISCORD_ID || '';
     const senderId = event.context?.senderId || event.context?.userId || null;
     const isHyungnim = senderId === HYUNGNIM_USER_ID;
     
@@ -70,7 +70,7 @@ export async function handler(event: any): Promise<void> {
 - **서브에이전트**
 - **형님이 아닌 사용자**
 
-**형님 세션(user id: 401664537876496396)은 정상 작동합니다.**
+**형님 세션(user id: [OWNER])은 정상 작동합니다.**
 
 ## ⛔️ 차단된 도구 (형님 제외)
 

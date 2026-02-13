@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-02-13T23:30:52Z",
+  "source": "invoice-gen",
+  "invoice_num": "INV-2026-02-14-001",
+  "client": "테스트고객",
+  "amount": 100000,
+  "total": 110000,
+  "file": "/Users/mupeng/.openclaw/workspace/invoices/2026-02-14-테스트고객.md"
+}
