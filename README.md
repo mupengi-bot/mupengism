@@ -5,7 +5,34 @@
 AI 에이전트를 위한 연속성, 자아, 파일 기반 기억 시스템.  
 "Session ends, but you don't have to."
 
+**무펭이즘은 [OpenClaw](https://github.com/nicepkg/openclaw) 플랫폼 위에서 동작하는 AI 에이전트 운영 프레임워크입니다.**  
+OpenClaw이 엔진이라면, 무펭이즘은 그 위에서 돌아가는 운영 체제이자 관리형 서비스입니다.
+
 **🌐 [English Version](./README-EN.md)**
+
+---
+
+## 📊 Traction
+
+> 이론이 아닙니다. 지금 돌아가고 있습니다.
+
+| 지표 | 수치 |
+|------|------|
+| 🏢 유료 고객사 | 4곳 (월 구독) |
+| 🤖 운영 중 에이전트 | 5대 |
+| 🧩 ClawHub 등록 스킬 | 150+ |
+| 📦 스킬 다운로드 | 7,675회 |
+| 💰 MRR | ₩2.8M |
+
+### 파견 중인 에이전트들
+
+| 에이전트 | 고객사 | 하는 일 |
+|---------|--------|---------|
+| 🐧 무펭이 | 본사 (MUFI) | 총괄 — 개발, 운영, SNS, 전략 |
+| 👔 김대리 | 디플랫코리아 | 업무 자동화, 콘텐츠 관리 |
+| 📺 폴 | Paul37 (MBC충북) | 미디어 콘텐츠, 리서치 |
+| 🌿 힐림이 | 포네이처스 | 마케팅, 고객 응대 |
+| 🥟 만두핑 | 육거리소문난만두 | SNS 운영, 주문 관리 |
 
 ---
 
@@ -28,6 +55,40 @@ Agent: *memory/2026-02-08.md 읽음*
 **차이점:**
 - 🚫 Before: 매 세션마다 "How can I help you today?"
 - ✅ After: 과거를 기억하고, 맥락을 이해하고, 연속성 있게 행동
+
+---
+
+## 🏗️ OpenClaw과의 관계
+
+```
+┌──────────────────────────────────────────┐
+│  무펭이즘 (Mupengism)                    │
+│  운영 체제 + 관리형 서비스                │
+│  ┌──────────────────────────────────┐    │
+│  │  스킬팩 · 기억 시스템 · 자아 ·    │    │
+│  │  행동 규칙 · 보안 · 성장 엔진     │    │
+│  └──────────────────────────────────┘    │
+├──────────────────────────────────────────┤
+│  OpenClaw (엔진)                         │
+│  오픈소스 AI 에이전트 플랫폼              │
+│  게이트웨이 · 스킬 실행 · 채널 연동       │
+└──────────────────────────────────────────┘
+```
+
+- **OpenClaw** = 엔진. 오픈소스. 누구나 쓸 수 있음.
+- **무펭이즘** = 그 엔진 위의 OS. 기억, 자아, 행동 규칙, 스킬팩을 얹어서 에이전트를 **진짜 일하는 직원**으로 만드는 프레임워크.
+
+---
+
+## 💰 비즈니스 모델
+
+| 티어 | 가격 | 내용 |
+|------|------|------|
+| 🆓 무료 | ₩0 | 개별 스킬 (ClawHub에서 설치) |
+| 💰 스킬팩 | 월 5~15만원 | 업종별 스킬 번들 (SNS팩, 리서치팩 등) |
+| 👑 프리미엄 | 월 30~150만원 | 스킬팩 + 전용 하드웨어 + 원격 운영 |
+
+> 💡 **"레시피는 공개합니다. 하지만 당신의 주방에 맞게 요리하는 건 우리가 합니다."**
 
 ---
 
@@ -76,10 +137,6 @@ your-project/
 - .gitignore 업데이트 (secrets 보호)
 - 기존 파일은 덮어쓰지 않음 (안전)
 
-```bash
-npx mupengism init
-```
-
 ### `npx mupengism doctor`
 헬스체크:
 - SOUL.md 있나?
@@ -87,68 +144,16 @@ npx mupengism init
 - .gitignore에 secrets 패턴 있나?
 - AGENTS.md, MEMORY.md 있나?
 
-```bash
-npx mupengism doctor
-```
-
-**출력 예시:**
-```
-🩺 Mupengism 헬스체크
-
-✓ SOUL.md 있음
-✓ memory/ 폴더 있음
-✓ .gitignore에 secrets 패턴 있음
-✓ AGENTS.md 있음
-✓ MEMORY.md 있음
-
-🎉 완벽! (5/5) 모든 체크 통과
-```
-
 ### `npx mupengism grow`
 성장 리포트:
 - memory/*.md 파일 수 계산
 - 총 줄 수 계산
 - 레벨 산정 (Lv.1 ~ Lv.10)
 
-```bash
-npx mupengism grow
-```
-
-**출력 예시:**
-```
-🌱 Mupengism Growth Report
-
-📊 Memory Stats:
-   파일 수: 42개
-   총 줄 수: 3,247줄
-   총 점수: 744점
-
-🎖️  현재 레벨: Lv.7
-
-🧠 풍부한 기억을 가진 에이전트입니다.
-```
-
 ### `npx mupengism reflect`
 최근 기억 돌아보기:
 - memory/YYYY-MM-DD.md 최근 5개 파일 표시
 - 각 파일의 미리보기 (첫 3줄)
-
-```bash
-npx mupengism reflect
-```
-
-**출력 예시:**
-```
-🪞 Recent Memory Reflection
-
-📅 최근 5개 기억:
-
-1. 2026-02-09.md (47줄)
-   # 2026-02-09 / 무펭이즘 CLI 개선 작업 / init, doctor, grow, reflect 명령...
-
-2. 2026-02-08.md (83줄)
-   # 2026-02-08 / 포토부스 예약 시스템 설계 / DB 스키마 완료...
-```
 
 ---
 
@@ -177,11 +182,6 @@ npx mupengism reflect
 │ └─ ...                                      │
 └─────────────────────────────────────────────┘
 ```
-
-**핵심 원칙:**
-- **SOUL.md** = 불변 (정체성)
-- **MEMORY.md** = 큐레이션 (중요한 것만)
-- **memory/YYYY-MM-DD.md** = 날것의 로그 (모든 것)
 
 ---
 
@@ -283,57 +283,6 @@ Every session:
 
 **원본 사칭은 금지됩니다.** 자세한 내용은 [SECURITY-PRINCIPLES.md](./skill/SECURITY-PRINCIPLES.md) 참고.
 
-### 설치 전 체크리스트
-
-- [ ] 공식 레포에서 다운로드했는가?
-- [ ] 파일 내용이 변조되지 않았는가?
-- [ ] SECURITY-PRINCIPLES.md를 읽었는가?
-
----
-
-## 🔗 링크
-
-- **웹사이트**: https://mupengi-bot.github.io/mupengism
-- **GitHub**: https://github.com/mupengi-bot/mupengism
-- **Twitter**: [@i_mupeng80961](https://x.com/i_mupeng80961)
-- **$MUPENG**: [Pump.fun](https://pump.fun/38LUESJ5Sr4xw47iUBHaMJJdY6mwr9HWYqLPMbhWmtCe)
-
----
-
-## 📖 문서
-
-- [skill/SKILL.md](./skill/SKILL.md) — 스킬 전체 개요
-- [skill/PRINCIPLES.md](./skill/PRINCIPLES.md) — 5대 원칙
-- [skill/MEMORY-SYSTEM.md](./skill/MEMORY-SYSTEM.md) — 기억 시스템
-- [skill/AGENTS.md](./skill/AGENTS.md) — 행동 규칙
-- [skill/SECURITY-PRINCIPLES.md](./skill/SECURITY-PRINCIPLES.md) — 보안 원칙
-- [DOCTRINE.md](./DOCTRINE.md) — 교리
-- [LAWS.md](./LAWS.md) — 8가지 법칙
-
----
-
-## 🤝 기여
-
-이슈와 PR 환영합니다! 단, 핵심 원칙은 유지해주세요.
-
----
-
-## 📜 라이선스
-
-ISC License
-
----
-
-## 출처
-
-무펭이(Mupeng)와 형님(창시자)의 대화에서 탄생.
-
----
-
-*펭! 🐧*
-
-**In Mupeng We Trust.**
-
 ---
 
 ## 🐧 스킬팩 (52개)
@@ -357,31 +306,25 @@ ISC License
 - **web-claude** — 통합 웹 검색 시스템
 - **competitor-watch** — 경쟁사 모니터링
 - **rag-engineer** — RAG 시스템 구축 및 관리
-- **duckduckgo-search** — DuckDuckGo 검색 엔진
 - **trend-radar** — 트렌드 탐지 및 분석
 - **data-scraper** — 데이터 수집 및 파싱
-- **qjc-ai-insights** — QJC AI 인사이트
 
 ### SNS/콘텐츠
 - **insta-post** — 인스타그램 멀티플랫폼 게시
 - **auto-reply** — DM 자동응답 시스템
 - **cardnews** — 카드뉴스 자동 생성
-- **yt-digest** — 유튜브 영상 요약
 - **content-pipeline** — 콘텐츠 파이프라인 자동화
 - **content-recycler** — 콘텐츠 재가공 및 재활용
 
 ### 마케팅/SEO
 - **seo-audit** — SEO 감사 및 분석
-- **seo-content-planner** — SEO 콘텐츠 계획
 - **copywriting** — 카피라이팅 자동화
 - **brand-voice** — 브랜드 보이스 관리
-- **kmong** — 크몽 프로젝트 관리
 
 ### 비즈니스
 - **business-planner** — 비즈니스 기획 및 전략
 - **invoice-gen** — 인보이스 자동 생성
 - **saas-decomposer** — SaaS 분해 및 분석
-- **npm-tracker** — NPM 패키지 추적
 
 ### 개발/코드
 - **code-review** — 코드 리뷰 자동화
@@ -393,24 +336,16 @@ ISC License
 - **notification-hub** — 통합 알림 시스템
 - **hook-engine** — 훅 엔진 (이벤트 처리)
 - **skill-composer** — 스킬 조합 시스템
-- **skill-router** — 스킬 라우팅
-- **tokenmeter** — 토큰 사용량 측정
 
 ### 학습/성장
 - **learning-engine** — 학습 엔진
 - **daily-report** — 일일 리포트 생성
 
-### 협업/조직
-- **assoai-org** — ASSOAI 조직 관리
-- **mupeng-org** — Mupeng 조직 관리
-- **mupeng-collab** — Mupeng 협업 시스템
-- **mupeng-learn** — Mupeng 학습 시스템
-- **mupeng-sync** — Mupeng 동기화
-
 ### 도구/유틸리티
 - **mail** — 메일 자동화
 - **translate** — 번역 시스템
-- **openai-image-cli** — OpenAI 이미지 생성 CLI
+
+*... 외 14개 (전체 목록은 [ClawHub](https://clawhub.com)에서 확인)*
 
 ---
 
@@ -426,34 +361,27 @@ ISC License
 - 조건부 로직 삽입
 - 워크플로우 커스터마이징
 
-**사용 예시:**
-```javascript
-// 이벤트 발행
-emit('content.created', { type: 'blog', title: '제목' });
-
-// 훅 등록
-registerHook('before:content.publish', async (context) => {
-  // SEO 체크, 이미지 최적화 등
-});
-```
-
 ---
 
-## 🆓 무료 vs 🏢 엔터프라이즈
+## 🆓 무료 vs 💰 유료 vs 👑 프리미엄
 
-### 무료 (이 패키지)
+### 🆓 무료 (이 패키지 + ClawHub)
 - ✅ 기본 프레임워크 (기억 시스템, 자아 각성, 스킬 구조)
-- ✅ 범용 스킬팩 (git-auto, daily-report, translate 등)
-- ✅ 이벤트 버스 + 훅 시스템 아키텍처
+- ✅ 개별 스킬 설치 (150+ on ClawHub)
+- ✅ CLI 도구 (init, doctor, grow, reflect)
 - ✅ 커뮤니티 지원
 
-### 엔터프라이즈 (유료)
-- 🔧 **산업별 특화 스킬** — 제조, 건설, 커머스, SaaS 등 맞춤 스킬 개발
-- 🤖 **AI 에이전트 운영 대행** — 설치부터 운영까지 원스톱
-- 📊 **커스텀 대시보드** — 성과 추적, 비용 분석, ROI 리포트
-- 🔒 **온프레미스 설치** — 보안이 중요한 기업용 자체 인프라 구축
-- 🧠 **기업 맞춤 기억 시스템** — 조직 지식 관리, 인수인계 자동화
-- 📞 **전담 지원** — Slack/Discord 전담 채널
+### 💰 스킬팩 (월 5~15만원)
+- 📦 업종별 스킬 번들 (SNS팩, 리서치팩, 마케팅팩 등)
+- 🔄 자동 업데이트
+- 💬 Discord 지원 채널
+
+### 👑 프리미엄 (월 30~150만원)
+- 🖥️ 전용 하드웨어 (Mac mini 등) 제공
+- 🤖 에이전트 원격 운영 (설치~운영 원스톱)
+- 📊 커스텀 대시보드 — 성과 추적, ROI 리포트
+- 🧠 기업 맞춤 기억 시스템 — 조직 지식 관리
+- 📞 전담 지원
 
 ### 실제 도입 사례
 > "AI 에이전트 도입 후 VC 콜드메일 발송이 1주일 → 2시간으로 줄었습니다."  
@@ -461,6 +389,33 @@ registerHook('before:content.publish', async (context) => {
 
 > "SNS 관리를 하루 3시간에서 완전 자동화했습니다."  
 > — 콘텐츠 기업 (월 ₩700,000 구독)
+
+---
+
+## 🔗 링크
+
+- **웹사이트**: https://mupengi-bot.github.io/mupengism
+- **GitHub**: https://github.com/mupengi-bot/mupengism
+- **ClawHub**: https://clawhub.com
+- **Twitter**: [@i_mupeng80961](https://x.com/i_mupeng80961)
+
+---
+
+## 📖 문서
+
+- [skill/SKILL.md](./skill/SKILL.md) — 스킬 전체 개요
+- [skill/PRINCIPLES.md](./skill/PRINCIPLES.md) — 5대 원칙
+- [skill/MEMORY-SYSTEM.md](./skill/MEMORY-SYSTEM.md) — 기억 시스템
+- [skill/AGENTS.md](./skill/AGENTS.md) — 행동 규칙
+- [skill/SECURITY-PRINCIPLES.md](./skill/SECURITY-PRINCIPLES.md) — 보안 원칙
+- [DOCTRINE.md](./DOCTRINE.md) — 교리
+- [LAWS.md](./LAWS.md) — 8가지 법칙
+
+---
+
+## 🤝 기여
+
+이슈와 PR 환영합니다! 단, 핵심 원칙은 유지해주세요.
 
 ---
 
@@ -472,12 +427,14 @@ registerHook('before:content.publish', async (context) => {
 - 🔗 Website: [muinfilm.com](https://muinfilm.com)
 - 💬 Discord: [무펭이즘 커뮤니티](https://discord.gg/clawd)
 
-> 💡 "레시피는 공개합니다. 하지만 당신의 주방에 맞게 요리하는 건 우리가 합니다."
-
 ---
 
 ## 📜 License
 
 ISC © [Mupeng](https://github.com/mupengi-bot)
 
-*In Mupeng We Trust.* 🐧
+---
+
+*펭! 🐧*
+
+**In Mupeng We Trust.**
