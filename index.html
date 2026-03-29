@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐧 무펭이 통합 대시보드</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'SF Mono', 'Fira Code', -apple-system, BlinkMacSystemFont, monospace; background: #0a0a0f; color: #e0e0e0; }
+  html { scroll-behavior: smooth; }
+
+  /* ── Nav ── */
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid #1a1a2a; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1rem; }
+  nav a { color: #888; font-size: 0.75rem; text-decoration: none; padding: 6px 14px; border: 1px solid transparent; border-radius: 6px; transition: all 0.2s; letter-spacing: 0.5px; }
+  nav a:hover, nav a.active { color: #00d4ff; border-color: #00d4ff; }
+  nav .brand { font-weight: 700; color: #e0e0e0; font-size: 0.85rem; margin-right: 1rem; }
+  .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #00ff88; animation: blink 1.5s infinite; margin-right: 4px; }
+
+  /* ── Crons ── */
+  .cron-filters { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.5rem; }
+  .cron-filter { background: #1a1a2a; border: 1px solid #2a2a3a; color: #888; padding: 5px 14px; border-radius: 6px; font-size: 0.7rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+  .cron-filter:hover, .cron-filter.active { color: #00d4ff; border-color: #00d4ff; }
+  .cron-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; max-width: 1200px; margin: 0 auto; }
+  .cron-card { background: #141420; border: 1px solid #2a2a3a; border-radius: 10px; padding: 14px 16px; transition: border-color 0.3s; }
+  .cron-card:hover { border-color: #00d4ff; }
+  .cron-card.disabled { opacity: 0.45; }
+  .cron-card .cron-name { font-size: 0.85rem; font-weight: 600; color: #e0e0e0; margin-bottom: 4px; }
+  .cron-card .cron-schedule { font-size: 0.65rem; color: #00ff88; margin-bottom: 6px; font-family: 'SF Mono', monospace; }
+  .cron-card .cron-meta { font-size: 0.6rem; color: #555; display: flex; gap: 12px; flex-wrap: wrap; }
+  .cron-card .cron-meta span { display: flex; align-items: center; gap: 3px; }
+  .cron-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 0.55rem; font-weight: 600; }
+  .cron-badge.cron-type { background: #1a2a1a; color: #00ff88; }
+  .cron-badge.agent-turn { background: #1a1a2a; color: #4da6ff; }
+  .cron-badge.system-event { background: #2a1a2a; color: #b366ff; }
+
+  /* ── Section ── */
+  .section { min-height: 60vh; padding: 3rem 1rem 2rem; max-width: 1400px; margin: 0 auto; border-bottom: 1px solid #111; }
+  .section:last-child { border-bottom: none; }
+  .section-head { text-align: center; margin-bottom: 2rem; }
+  .section-head h2 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+  .section-head p { color: #555; font-size: 0.75rem; letter-spacing: 1px; }
+
+  /* ── Protocol Metrics ── */
+  .metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2rem; max-width: 900px; margin: 0 auto; }
+  @media (max-width: 700px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+  .m-card { background: #141420; border: 1px solid #2a2a3a; border-radius: 12px; padding: 1.5rem; text-align: center; transition: border-color 0.3s; }
+  .m-card:hover { border-color: #00d4ff; }
+  .m-card .val { font-size: 2.2rem; font-weight: 700; color: #00d4ff; }
+  .m-card .lbl { color: #666; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ── Agents ── */
+  .stats-bar { display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 1.5rem; }
+  .stat { text-align: center; }
+  .stat .num { font-size: 2rem; font-weight: 700; }
+  .stat .lbl { font-size: 0.6rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+
+  .category { margin-bottom: 1.2rem; }
+  .cat-header { display: flex; align-items: center; gap: 8px; padding: 6px 0; margin-bottom: 6px; border-bottom: 1px solid #1a1a2a; }
+  .cat-icon { font-size: 1.1rem; }
+  .cat-name { font-size: 0.8rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+  .cat-count { font-size: 0.65rem; color: #444; margin-left: auto; }
+  .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+
+  /* Category color cards */
+  .a-card { padding: 10px 12px; border-radius: 8px; min-height: 68px; transition: all 0.3s; }
+  .a-card .top { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .a-card .name { font-size: 0.75rem; font-weight: 600; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .a-card .task { color: #666; font-size: 0.65rem; margin-top: 4px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .a-card .tokens { color: #444; font-size: 0.6rem; margin-top: 4px; }
+
+  /* Main agent */
+  .a-card.cat-main { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.3); animation: glow-blue 2s ease-in-out infinite alternate; }
+  .a-card.cat-main .dot { background: #00d4ff; animation: blink 1s infinite; }
+  /* 디자인 - pink */
+  .a-card.cat-design { background: rgba(255,105,180,0.08); border: 1px solid rgba(255,105,180,0.3); }
+  .a-card.cat-design.is-active { animation: glow-pink 2.5s ease-in-out infinite alternate; }
+  .a-card.cat-design .dot { background: #ff69b4; }
+  /* 개발 - green */
+  .a-card.cat-dev { background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.25); }
+  .a-card.cat-dev.is-active { animation: glow 2.5s ease-in-out infinite alternate; }
+  .a-card.cat-dev .dot { background: #00ff88; }
+  /* 보안 - blue */
+  .a-card.cat-security { background: rgba(66,133,244,0.08); border: 1px solid rgba(66,133,244,0.3); }
+  .a-card.cat-security.is-active { animation: glow-blue 2.5s ease-in-out infinite alternate; }
+  .a-card.cat-security .dot { background: #4285f4; }
+  /* 운영 - purple */
+  .a-card.cat-ops { background: rgba(160,100,255,0.08); border: 1px solid rgba(160,100,255,0.3); }
+  .a-card.cat-ops.is-active { animation: glow-purple 2.5s ease-in-out infinite alternate; }
+  .a-card.cat-ops .dot { background: #a064ff; }
+  /* 경제 - white/bright */
+  .a-card.cat-econ { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); }
+  .a-card.cat-econ.is-active { animation: glow-white 2.5s ease-in-out infinite alternate; }
+  .a-card.cat-econ .dot { background: #e0e0e0; }
+  /* failed */
+  .a-card.is-failed { border-color: rgba(255,68,68,0.4) !important; }
+  .a-card.is-failed .dot { background: #ff4444 !important; }
+  /* idle (not active) */
+  .a-card:not(.is-active):not(.cat-main) { opacity: 0.55; }
+  .a-card.is-active .dot { animation: blink 1.5s infinite; }
+
+  /* Archive section */
+  .archive-toggle { cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px; padding: 10px 0; margin-top: 1.5rem; border-top: 1px solid #1a1a2a; }
+  .archive-toggle h3 { font-size: 0.85rem; color: #555; font-weight: 600; }
+  .archive-toggle .arrow { color: #444; font-size: 0.7rem; transition: transform 0.3s; }
+  .archive-toggle .arrow.open { transform: rotate(90deg); }
+  .archive-section { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; }
+  .archive-section.open { max-height: 5000px; }
+  .archive-section .a-card { opacity: 0.4 !important; }
+
+  /* fade-in */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .a-card { animation: fadeIn 0.4s ease forwards; }
+
+  /* ── Growth ── */
+  .level-section { text-align: center; margin-bottom: 2rem; }
+  .level-number { font-size: 4rem; font-weight: 900; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.6); animation: pulse-glow 2s ease-in-out infinite; }
+  .level-label { color: #555; font-size: 0.8rem; letter-spacing: 3px; margin-top: -8px; }
+  .xp-section { max-width: 500px; margin: 1rem auto 0; }
+  .xp-info { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.7rem; color: #888; }
+  .xp-bar-bg { background: #1a1a2a; border-radius: 12px; height: 20px; overflow: hidden; position: relative; }
+  .xp-bar-fill { height: 100%; background: linear-gradient(90deg, #00d4ff, #00ff88); border-radius: 12px; transition: width 1s ease; position: relative; overflow: hidden; }
+  .xp-bar-fill::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: xp-shine 2s infinite; }
+  .xp-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 0.65rem; font-weight: 700; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+
+  .growth-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  @media (max-width: 900px) { .growth-grid { grid-template-columns: 1fr; } }
+  .panel { background: rgba(255,255,255,0.02); border: 1px solid #1a1a2a; border-radius: 12px; padding: 1.5rem; }
+  .panel:hover { border-color: #2a2a3a; }
+  .panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #1a1a2a; }
+  .panel-icon { font-size: 1.3rem; }
+  .panel-title { font-size: 0.85rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+  #skills-canvas { width: 100%; height: 280px; }
+
+  .timeline-item { display: flex; gap: 1rem; margin-bottom: 1.2rem; position: relative; }
+  .timeline-item::before { content: ''; position: absolute; left: 15px; top: 28px; width: 2px; height: calc(100% + 6px); background: #1a1a2a; }
+  .timeline-item:last-child::before { display: none; }
+  .timeline-dot { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #00d4ff, #00ff88); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 0 10px rgba(0,255,136,0.3); position: relative; z-index: 1; }
+  .timeline-date { font-size: 0.6rem; color: #555; }
+  .timeline-title { font-size: 0.8rem; font-weight: 600; color: #ccc; }
+  .timeline-desc { font-size: 0.65rem; color: #777; line-height: 1.3; }
+
+  .challenge { background: rgba(255,255,255,0.03); border: 1px solid #1a1a2a; border-radius: 8px; padding: 0.7rem; margin-bottom: 0.6rem; }
+  .challenge.completed { border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.05); }
+  .challenge-top { display: flex; align-items: center; gap: 8px; }
+  .challenge-check { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; }
+  .challenge.completed .challenge-check { border-color: #00ff88; background: #00ff88; color: #0a0a0f; }
+  .challenge-name { font-size: 0.7rem; font-weight: 600; color: #aaa; flex: 1; }
+  .challenge-reward { font-size: 0.6rem; color: #ff9500; }
+
+  .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.8rem; }
+  .achievement { text-align: center; padding: 0.8rem 0.4rem; background: rgba(255,255,255,0.02); border: 1px solid #1a1a2a; border-radius: 8px; transition: all 0.3s; }
+  .achievement.unlocked { border-color: rgba(255,149,0,0.4); background: rgba(255,149,0,0.05); }
+  .achievement:hover { transform: translateY(-3px); }
+  .achievement-icon { font-size: 1.8rem; filter: grayscale(1) opacity(0.3); }
+  .achievement.unlocked .achievement-icon { filter: none; }
+  .achievement-name { font-size: 0.6rem; color: #666; line-height: 1.2; margin-top: 4px; }
+  .achievement.unlocked .achievement-name { color: #ff9500; font-weight: 600; }
+  .achievement-date { font-size: 0.5rem; color: #333; margin-top: 2px; }
+  .achievement.unlocked .achievement-date { color: #555; }
+
+  /* ── Agent Board Split Layout ── */
+  .board-split { display: flex; flex-direction: column; gap: 1.5rem; }
+  .board-main { min-width: 0; }
+  .board-side { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.8rem; align-content: start; }
+  @media (max-width: 600px) { .board-side { grid-template-columns: 1fr; } }
+
+  .side-panel { background: #141420; border: 1px solid #1a1a2a; border-radius: 12px; padding: 1rem; min-height: 0; }
+  .side-panel h4 { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 6px; }
+  .side-panel canvas { width: 100%; display: block; }
+
+  .activity-item { font-size: 0.65rem; color: #888; padding: 4px 0; border-bottom: 1px solid #1a1a2a; display: flex; align-items: center; gap: 6px; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-time { color: #555; font-size: 0.6rem; white-space: nowrap; }
+
+  /* ── Footer ── */
+  .footer { text-align: center; padding: 2rem; color: #333; font-size: 0.7rem; }
+  .footer a { color: #00d4ff; text-decoration: none; }
+
+  /* ── Animations ── */
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes glow { from { box-shadow: 0 0 4px rgba(0,255,136,0.05); } to { box-shadow: 0 0 12px rgba(0,255,136,0.15); } }
+  @keyframes glow-blue { from { box-shadow: 0 0 4px rgba(0,212,255,0.05); } to { box-shadow: 0 0 12px rgba(0,212,255,0.15); } }
+  @keyframes glow-pink { from { box-shadow: 0 0 4px rgba(255,105,180,0.05); } to { box-shadow: 0 0 12px rgba(255,105,180,0.15); } }
+  @keyframes glow-purple { from { box-shadow: 0 0 4px rgba(160,100,255,0.05); } to { box-shadow: 0 0 12px rgba(160,100,255,0.15); } }
+  @keyframes glow-white { from { box-shadow: 0 0 4px rgba(255,255,255,0.03); } to { box-shadow: 0 0 12px rgba(255,255,255,0.08); } }
+  @keyframes pulse-glow { 0%,100% { text-shadow: 0 0 20px rgba(0,255,136,0.6); } 50% { text-shadow: 0 0 30px rgba(0,255,136,0.8), 0 0 60px rgba(0,255,136,0.4); } }
+  @keyframes xp-shine { 0% { left: -100%; } 100% { left: 200%; } }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <span class="brand">🐧 무펭이</span>
+  <a href="#protocol" onclick="setActive(this)">📊 프로토콜 지표</a>
+  <a href="#agents" onclick="setActive(this)">🐧 군단 현황</a>
+  <a href="#growth" onclick="setActive(this)">📈 성장 추적</a>
+  <a href="#crons" onclick="setActive(this)">⏰ 크론</a>
+  <span style="margin-left:1rem;color:#444;font-size:0.6rem"><span class="live-dot"></span>LIVE · 15s</span>
+  <button id="refresh-btn" onclick="refreshAgents()" style="margin-left:auto;padding:4px 12px;background:#333;border:1px solid #555;border-radius:6px;color:#0f0;font-size:0.7rem;cursor:pointer;font-family:inherit;transition:all 0.2s">🔄 갱신</button>
+</nav>
+
+<!-- ═══════════════ Section 1: Protocol Metrics ═══════════════ -->
+<div class="section" id="protocol">
+  <div class="section-head">
+    <h2>📊 프로토콜 채택 지표</h2>
+    <p>mupengi-bot/mupengism · 마지막 업데이트: <span id="p-ts">-</span></p>
+  </div>
+  <div class="metrics-grid">
+    <div class="m-card"><div class="val" id="p-stars">-</div><div class="lbl">GitHub Stars</div></div>
+    <div class="m-card"><div class="val" id="p-forks">-</div><div class="lbl">GitHub Forks</div></div>
+    <div class="m-card"><div class="val" id="p-clones">-</div><div class="lbl">Clones (14d)</div></div>
+    <div class="m-card"><div class="val" id="p-views">-</div><div class="lbl">Views (14d)</div></div>
+    <div class="m-card"><div class="val" id="p-npm">-</div><div class="lbl">npm Downloads (7d)</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ Section 2: Agent Board ═══════════════ -->
+<div class="section" id="agents">
+  <div class="section-head">
+    <h2>🐧 군단 라이브 보드</h2>
+    <p>에이전트 실시간 상태 · <span id="a-ts">-</span></p>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="num" id="a-total" style="color:#00d4ff">0</div><div class="lbl">Total</div></div>
+    <div class="stat"><div class="num" id="a-active" style="color:#00ff88">0</div><div class="lbl">Active</div></div>
+    <div class="stat"><div class="num" id="a-done" style="color:#666">0</div><div class="lbl">Done</div></div>
+    <div class="stat"><div class="num" id="a-tokens" style="color:#ff9500">0</div><div class="lbl">Tokens (k)</div></div>
+  </div>
+  <div class="board-split">
+    <div class="board-side" id="side-charts">
+      <div class="side-panel">
+        <h4>📊 커밋 히스토리 (7일)</h4>
+        <canvas id="chart-commits" height="100"></canvas>
+      </div>
+      <div class="side-panel">
+        <h4>🍩 카테고리 분포</h4>
+        <canvas id="chart-donut" height="160"></canvas>
+      </div>
+      <div class="side-panel">
+        <h4>⚡ 토큰 사용량</h4>
+        <canvas id="chart-tokens" height="60"></canvas>
+      </div>
+      <div class="side-panel">
+        <h4>🕐 최근 활동</h4>
+        <div id="activity-timeline"></div>
+      </div>
+      <div class="side-panel">
+        <h4>🎮 레벨 게이지</h4>
+        <canvas id="chart-level" height="120"></canvas>
+      </div>
+    </div>
+    <div class="board-main" id="agent-board"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ Section 3: Growth ═══════════════ -->
+<div class="section" id="growth">
+  <div class="section-head">
+    <h2>📈 성장 추적</h2>
+    <p>AGENT GROWTH · RPG MODE</p>
+  </div>
+  <div class="level-section">
+    <div class="level-number" id="g-level">0.00</div>
+    <div class="level-label">CURRENT LEVEL</div>
+    <div class="xp-section">
+      <div class="xp-info"><span>XP Progress</span><span id="g-xp-pct">0%</span></div>
+      <div class="xp-bar-bg">
+        <div class="xp-bar-fill" id="g-xp-bar" style="width:0%">
+          <span class="xp-text" id="g-xp-text">0 / 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="growth-grid">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">🎯</span><span class="panel-title">Skill Tree</span></div>
+      <canvas id="skills-canvas"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">📈</span><span class="panel-title">Growth History</span></div>
+      <div id="g-timeline"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">🎲</span><span class="panel-title">Daily Challenges</span></div>
+      <div id="g-challenges"></div>
+    </div>
+    <div class="panel" style="grid-column:1/-1">
+      <div class="panel-header"><span class="panel-icon">🏆</span><span class="panel-title">Achievements</span></div>
+      <div class="achievements-grid" id="g-achievements"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ Section 4: Crons ═══════════════ -->
+<div class="section" id="crons">
+  <div class="section-head">
+    <h2>⏰ 크론 작업</h2>
+    <p>스케줄 현황 · <span id="c-total">0</span>개 활성 / <span id="c-disabled">0</span>개 비활성</p>
+  </div>
+  <div class="cron-filters">
+    <button class="cron-filter active" onclick="filterCrons('all',this)">전체</button>
+    <button class="cron-filter" onclick="filterCrons('cron',this)">반복</button>
+    <button class="cron-filter" onclick="filterCrons('every',this)">인터벌</button>
+    <button class="cron-filter" onclick="filterCrons('at',this)">일회성</button>
+    <button class="cron-filter" onclick="filterCrons('disabled',this)">비활성</button>
+  </div>
+  <div class="cron-list" id="cron-list"></div>
+</div>
+
+<div class="footer">
+  무펭이즘 v2 · <a href="https://github.com/mupengi-bot/mupengism">GitHub</a> · 돈 = 에너지 = 존재
+</div>
+
+<script>
+// ── Nav active state ──
+function setActive(el) {
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+}
+// Highlight on scroll
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('nav a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+
+// ═══ Section 1: Protocol Stats ═══
+function loadProtocol() {
+  fetch('/api/stats').then(r => r.json()).then(d => {
+    document.getElementById('p-ts').textContent = new Date(d.timestamp).toLocaleString('ko-KR');
+    document.getElementById('p-stars').textContent = d.github.stars;
+    document.getElementById('p-forks').textContent = d.github.forks;
+    document.getElementById('p-clones').textContent = d.github.clones_14d;
+    document.getElementById('p-views').textContent = d.github.views_14d;
+    document.getElementById('p-npm').textContent = d.npm.downloads_7d;
+    // npm 개별 표시 (있으면)
+    if (d.npm.mupengism_7d !== undefined) {
+      document.getElementById('p-npm').innerHTML = d.npm.downloads_7d + '<br><span style="font-size:0.5rem;color:#555">mupengism:' + d.npm.mupengism_7d + ' · assoai:' + d.npm.assoai_mcp_7d + '</span>';
+    }
+  }).catch(() => {});
+}
+
+// ═══ Section 2: Agent Board ═══
+const CAT_DEFS = [
+  { id: 'design',   name: '디자인', icon: '🩷', cls: 'cat-design' },
+  { id: 'dev',      name: '개발',   icon: '💚', cls: 'cat-dev' },
+  { id: 'security', name: '보안',   icon: '💙', cls: 'cat-security' },
+  { id: 'ops',      name: '운영',   icon: '💜', cls: 'cat-ops' },
+  { id: 'econ',     name: '경제',   icon: '🤍', cls: 'cat-econ' },
+];
+
+function detectCategory(a) {
+  if (a.category) return a.category;
+  if (a.label === 'main') return 'main';
+  const s = (a.label + ' ' + (a.project || '') + ' ' + (a.lastTask || '')).toLowerCase();
+  if (/디자인|design|리뉴얼|ui수정/.test(s)) return 'design';
+  if (/보안|security|redteam|레드팀|블루팀|카오스|guard|backup|커널보호/.test(s)) return 'security';
+  if (/대시보드|npm|publish|prune|seo|확산|포스터|가지치기|think-tank/.test(s)) return 'ops';
+  if (/경제|economy|wallet|sniper|fee|스나이퍼|경제엔진/.test(s)) return 'econ';
+  if (/기능|구현|db|api|mcp|boot|ui|ux|채팅|파일|온보딩|설계|인스톨|프로토콜|layer|독자|오픈소스|진화|실험|분석|고도화|배치/.test(s)) return 'dev';
+  return 'dev';
+}
+
+let archiveOpen = false; // 아카이브 토글 상태 보존
+
+function isArchived(a) {
+  return !a.active && (a.status === 'completed' || a.status === 'done' || /^✅/.test(a.lastTask || ''));
+}
+
+function loadAgents() {
+  fetch('/api/agents?t=' + Date.now()).then(r => r.json()).then(data => {
+    const board = document.getElementById('agent-board');
+    board.innerHTML = '';
+    const agents = data.agents || [];
+    let total = 0, activeN = 0, doneN = 0, tkTotal = 0;
+
+    // classify
+    agents.forEach(a => { a._cat = detectCategory(a); a._archived = isArchived(a); });
+    agents.forEach(a => { total++; if (a.active) activeN++; if (a._archived) doneN++; tkTotal += a.tokens || 0; });
+
+    // Main agent first
+    const mainAgent = agents.find(a => a._cat === 'main');
+    if (mainAgent) {
+      const div = document.createElement('div'); div.className = 'category';
+      div.innerHTML = `<div class="cat-header"><span class="cat-icon">🧠</span><span class="cat-name">코어</span></div><div class="agents-grid"></div>`;
+      div.querySelector('.agents-grid').innerHTML = renderCard(mainAgent, 'cat-main');
+      board.appendChild(div);
+    }
+
+    // Active agents by category
+    const liveAgents = agents.filter(a => a._cat !== 'main' && !a._archived);
+    for (const cat of CAT_DEFS) {
+      const group = liveAgents.filter(a => a._cat === cat.id);
+      if (!group.length) continue;
+      const ac = group.filter(a => a.active).length;
+      const div = document.createElement('div'); div.className = 'category';
+      div.innerHTML = `<div class="cat-header"><span class="cat-icon">${cat.icon}</span><span class="cat-name">${cat.name}</span><span class="cat-count">${ac > 0 ? '🟢 '+ac+' active · ' : ''}${group.length}명</span></div><div class="agents-grid"></div>`;
+      const grid = div.querySelector('.agents-grid');
+      group.sort((a,b) => (b.active?1:0) - (a.active?1:0));
+      group.forEach(a => grid.innerHTML += renderCard(a, cat.cls));
+      board.appendChild(div);
+    }
+
+    // Archive section
+    const archived = agents.filter(a => a._cat !== 'main' && a._archived);
+    if (archived.length) {
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `<div class="archive-toggle" onclick="archiveOpen=!archiveOpen;this.querySelector('.arrow').classList.toggle('open');this.nextElementSibling.classList.toggle('open')"><span class="arrow${archiveOpen?' open':''}">▶</span><h3>📦 아카이브 (${archived.length})</h3></div><div class="archive-section${archiveOpen?' open':''}"></div>`;
+      const archDiv = wrap.querySelector('.archive-section');
+      // group archived by category too
+      for (const cat of CAT_DEFS) {
+        const group = archived.filter(a => a._cat === cat.id);
+        if (!group.length) continue;
+        const sec = document.createElement('div'); sec.className = 'category';
+        sec.innerHTML = `<div class="cat-header"><span class="cat-icon">${cat.icon}</span><span class="cat-name">${cat.name}</span><span class="cat-count">${group.length}명</span></div><div class="agents-grid"></div>`;
+        const grid = sec.querySelector('.agents-grid');
+        group.forEach(a => grid.innerHTML += renderCard(a, cat.cls));
+        archDiv.appendChild(sec);
+      }
+      board.appendChild(wrap);
+    }
+
+    document.getElementById('a-total').textContent = total;
+    document.getElementById('a-active').textContent = activeN;
+    document.getElementById('a-done').textContent = doneN;
+    document.getElementById('a-tokens').textContent = (tkTotal / 1000).toFixed(0);
+    document.getElementById('a-ts').textContent = data.timestamp ? new Date(data.timestamp).toLocaleString('ko-KR') : '-';
+
+    // Idle state
+    if (activeN === 0 && total === 0) {
+      board.innerHTML = '<div style="text-align:center;padding:3rem;color:#333;font-size:0.9rem">😴 군단 대기 중 — 서브에이전트가 소환되면 여기에 표시됩니다</div>';
+    }
+
+    // Adaptive polling toggle
+    const wasActive = hasActiveAgents;
+    hasActiveAgents = activeN > 0;
+    if (wasActive !== hasActiveAgents) startPolling();
+
+    renderSideCharts(agents);
+  }).catch(() => {});
+}
+
+function renderCard(a, catCls) {
+  const isFailed = /^❌|^⚠️/.test(a.lastTask || '');
+  const activeClass = a.active ? 'is-active' : '';
+  const failClass = isFailed ? 'is-failed' : '';
+  const tk = ((a.tokens || 0) / 1000).toFixed(1);
+  return `<div class="a-card ${catCls} ${activeClass} ${failClass}"><div class="top"><div class="dot"></div><div class="name">${a.label}</div></div><div class="task">${a.lastTask || '-'}</div><div class="tokens">${tk}k tok</div></div>`;
+}
+
+// ═══ Section 3: Growth ═══
+let growthState = {};
+function loadGrowth() {
+  fetch('growth-state.json?t=' + Date.now()).then(r => r.json()).then(data => {
+    growthState = data;
+    renderGrowth();
+    drawLevelGauge();
+  }).catch(() => {});
+}
+
+function renderGrowth() {
+  const s = growthState;
+  if (!s.level) return;
+  document.getElementById('g-level').textContent = s.level.toFixed(3);
+  const pct = Math.min(100, Math.round((s.xp.current / s.xp.nextLevel) * 100));
+  document.getElementById('g-xp-bar').style.width = pct + '%';
+  document.getElementById('g-xp-text').textContent = `${s.xp.current} / ${s.xp.nextLevel}`;
+  document.getElementById('g-xp-pct').textContent = pct + '%';
+  renderSkills();
+
+  document.getElementById('g-timeline').innerHTML = s.timeline.map(i => `
+    <div class="timeline-item"><div class="timeline-dot">${i.icon}</div><div><div class="timeline-date">${i.date}</div><div class="timeline-title">${i.title}</div><div class="timeline-desc">${i.description}</div></div></div>`).join('');
+
+  document.getElementById('g-challenges').innerHTML = s.challenges.map(c => `
+    <div class="challenge ${c.completed ? 'completed' : ''}"><div class="challenge-top"><div class="challenge-check">${c.completed ? '✓' : ''}</div><div class="challenge-name">${c.name}</div><div class="challenge-reward">+${c.xp} XP</div></div></div>`).join('');
+
+  document.getElementById('g-achievements').innerHTML = s.achievements.map(a => `
+    <div class="achievement ${a.unlocked ? 'unlocked' : ''}"><div class="achievement-icon">${a.icon}</div><div class="achievement-name">${a.name}</div><div class="achievement-date">${a.unlocked ? a.date : '🔒'}</div></div>`).join('');
+}
+
+function renderSkills() {
+  const canvas = document.getElementById('skills-canvas');
+  if (!growthState.skills) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const cx = rect.width / 2, cy = rect.height / 2, maxR = Math.min(cx, cy) - 35;
+  const skills = growthState.skills, n = skills.length, step = (Math.PI * 2) / n;
+
+  ctx.strokeStyle = '#1a1a2a'; ctx.lineWidth = 1;
+  for (let i = 1; i <= 5; i++) { ctx.beginPath(); ctx.arc(cx, cy, (maxR / 5) * i, 0, Math.PI * 2); ctx.stroke(); }
+  skills.forEach((_, i) => { const a = i * step - Math.PI / 2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * maxR, cy + Math.sin(a) * maxR); ctx.stroke(); });
+
+  ctx.beginPath();
+  skills.forEach((s, i) => { const a = i * step - Math.PI / 2, r = maxR * (s.value / 5); const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.closePath(); ctx.fillStyle = 'rgba(0,212,255,0.15)'; ctx.fill(); ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.fillStyle = '#888'; ctx.font = '11px SF Mono, monospace'; ctx.textAlign = 'center';
+  skills.forEach((s, i) => { const a = i * step - Math.PI / 2, lr = maxR + 22; ctx.fillStyle = '#888'; ctx.font = '11px SF Mono'; ctx.fillText(s.name, cx + Math.cos(a) * lr, cy + Math.sin(a) * lr + 4); ctx.fillStyle = '#00d4ff'; ctx.font = 'bold 10px SF Mono'; ctx.fillText(s.value.toFixed(1), cx + Math.cos(a) * lr, cy + Math.sin(a) * lr + 16); });
+}
+
+// ═══ Refresh agents via API ═══
+async function refreshAgents() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = '⏳ 갱신 중...';
+  btn.style.color = '#ff0';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/refresh', { method: 'POST' });
+    const j = await r.json();
+    if (j.ok) {
+      btn.textContent = '✅ 완료!';
+      btn.style.color = '#0f0';
+      loadAll();
+      setTimeout(() => { btn.textContent = '🔄 갱신'; btn.disabled = false; }, 2000);
+    } else {
+      btn.textContent = '❌ 실패';
+      btn.style.color = '#f00';
+      setTimeout(() => { btn.textContent = '🔄 갱신'; btn.style.color = '#0f0'; btn.disabled = false; }, 3000);
+    }
+  } catch(e) {
+    btn.textContent = '❌ 에러';
+    btn.style.color = '#f00';
+    setTimeout(() => { btn.textContent = '🔄 갱신'; btn.style.color = '#0f0'; btn.disabled = false; }, 3000);
+  }
+}
+
+// ═══ Side Charts ═══
+let sideChartsOpen = true; // state preserved across refreshes
+
+// ═══ Side Charts (Chart.js) ═══
+const CAT_COLORS = { design:'#ff69b4', dev:'#00ff88', security:'#4da6ff', ops:'#b366ff', econ:'#e0e0e0', main:'#00d4ff' };
+const CAT_NAMES = { design:'디자인', dev:'개발', security:'보안', ops:'운영', econ:'경제', main:'코어' };
+let chartInstances = {};
+let lastChartHash = '';
+
+function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
+
+function dataHash(obj) { return JSON.stringify(obj).split('').reduce((h,c)=>(((h<<5)-h)+c.charCodeAt(0))|0, 0).toString(36); }
+
+Chart.defaults.color = '#888';
+Chart.defaults.font.family = "'SF Mono', 'JetBrains Mono', monospace";
+Chart.defaults.font.size = 11;
+
+function renderSideCharts(agents) {
+  // Skip re-render if data unchanged
+  const hash = dataHash(agents.map(a=>({c:a._cat,t:a.tokens,a:a.active,ar:a._archived})));
+  if (hash === lastChartHash) return;
+  lastChartHash = hash;
+
+  // 1. 도넛 — 카테고리 분포
+  const catCounts = {};
+  agents.filter(a => a._cat !== 'main').forEach(a => { catCounts[a._cat] = (catCounts[a._cat]||0) + 1; });
+  const catEntries = Object.entries(catCounts);
+  destroyChart('donut');
+  const donutCtx = document.getElementById('chart-donut');
+  if (donutCtx && catEntries.length) {
+    chartInstances['donut'] = new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: catEntries.map(([c])=> CAT_NAMES[c]||c),
+        datasets: [{ data: catEntries.map(([,v])=>v), backgroundColor: catEntries.map(([c])=>CAT_COLORS[c]||'#555'), borderWidth: 0 }]
+      },
+      options: {
+        responsive: true, cutout: '60%',
+        plugins: {
+          legend: { position:'bottom', labels:{ boxWidth:10, padding:6, font:{size:10} } },
+          tooltip: { callbacks: { label: (c) => c.label+': '+c.raw+'명' } }
+        }, animation: { animateRotate: true, duration: 800 }
+      }
+    });
+  }
+
+  // 2. 토큰 바 — TOP 5 (horizontal)
+  const sorted = [...agents].filter(a=>a.tokens>0&&a._cat!=='main').sort((a,b)=>b.tokens-a.tokens).slice(0,5);
+  destroyChart('tokens');
+  const tokenCtx = document.getElementById('chart-tokens');
+  if (tokenCtx && sorted.length) {
+    chartInstances['tokens'] = new Chart(tokenCtx, {
+      type: 'bar',
+      data: {
+        labels: sorted.map(a => a.label.slice(0,10)),
+        datasets: [{ data: sorted.map(a => Math.round(a.tokens/1000)),
+          backgroundColor: sorted.map(a => CAT_COLORS[a._cat]||'#00ff88'),
+          borderRadius: 4, barThickness: 14 }]
+      },
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: { legend:{display:false}, tooltip:{ callbacks:{ label:(c)=>c.raw+'k tokens' } } },
+        scales: { x:{display:false,grid:{display:false}}, y:{grid:{display:false},ticks:{font:{size:9}}} },
+        animation: { duration: 600 }
+      }
+    });
+  }
+
+  // 3. 최근 활동 타임라인 (HTML)
+  const timeline = document.getElementById('activity-timeline');
+  if (timeline) {
+    const done = agents.filter(a => a._archived).slice(0, 6);
+    timeline.innerHTML = done.length ? done.map(a => {
+      const color = CAT_COLORS[a._cat]||'#555';
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:0.65rem">
+        <span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0"></span>
+        <span style="color:#aaa;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.label}</span>
+        <span style="color:#444">${(a.tokens/1000).toFixed(0)}k</span>
+      </div>`;
+    }).join('') : '<div style="color:#444;font-size:0.6rem">아직 없음</div>';
+  }
+
+  // 4. 레벨 게이지 (도넛 변형)
+  destroyChart('level');
+  const levelCtx = document.getElementById('chart-level');
+  if (levelCtx && growthState.level) {
+    const lv = growthState.level;
+    const pct = (lv / 5.0) * 100;
+    chartInstances['level'] = new Chart(levelCtx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [pct, 100-pct],
+          backgroundColor: ['#00ff88', '#1a1a2a'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true, cutout: '75%', rotation: -90, circumference: 180,
+        plugins: { legend:{display:false}, tooltip:{enabled:false} },
+        animation: { duration: 1000 }
+      },
+      plugins: [{
+        id: 'levelText',
+        afterDraw(chart) {
+          const {ctx, chartArea:{left,right,top,bottom}} = chart;
+          const cx = (left+right)/2, cy = (top+bottom)/2 + 10;
+          ctx.save();
+          ctx.fillStyle = '#fff'; ctx.font = 'bold 20px SF Mono, monospace'; ctx.textAlign = 'center';
+          ctx.fillText(lv.toFixed(3), cx, cy);
+          ctx.fillStyle = '#555'; ctx.font = '10px SF Mono'; ctx.fillText('/ 5.000', cx, cy+16);
+          ctx.restore();
+        }
+      }]
+    });
+  }
+
+  // 5. 커밋/stats 바 차트
+  destroyChart('commits');
+  const commitCtx = document.getElementById('chart-commits');
+  if (commitCtx) {
+    fetch('/api/stats').then(r=>r.json()).then(stats => {
+      const items = [];
+      if (stats.github_stars) items.push({l:'⭐ Stars', v:stats.github_stars, c:'#00d4ff'});
+      if (stats.npm_downloads) items.push({l:'📦 npm', v:stats.npm_downloads, c:'#ff9500'});
+      items.push({l:'🐧 Agents', v:agents.length, c:'#00ff88'});
+      destroyChart('commits');
+      chartInstances['commits'] = new Chart(commitCtx, {
+        type: 'bar',
+        data: {
+          labels: items.map(i=>i.l),
+          datasets: [{ data: items.map(i=>i.v), backgroundColor: items.map(i=>i.c), borderRadius: 6, barThickness: 24 }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend:{display:false}, tooltip:{callbacks:{label:(c)=>c.raw.toLocaleString()}} },
+          scales: { y:{display:false,grid:{display:false}}, x:{grid:{display:false},ticks:{font:{size:9}}} },
+          animation: { duration: 800, easing: 'easeOutQuart' }
+        }
+      });
+    }).catch(()=>{});
+  }
+}
+
+// ═══ Section 4: Crons ═══
+let allCrons = [];
+let cronFilter = 'all';
+
+function loadCrons() {
+  fetch('/api/crons?t=' + Date.now()).then(r => r.json()).then(data => {
+    allCrons = data.jobs || [];
+    document.getElementById('c-total').textContent = allCrons.filter(j => j.enabled !== false).length;
+    document.getElementById('c-disabled').textContent = allCrons.filter(j => j.enabled === false).length;
+    renderCrons();
+  }).catch(() => {});
+}
+
+function filterCrons(f, el) {
+  cronFilter = f;
+  document.querySelectorAll('.cron-filter').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderCrons();
+}
+
+function renderCrons() {
+  const list = document.getElementById('cron-list');
+  let jobs = [...allCrons];
+  if (cronFilter === 'disabled') jobs = jobs.filter(j => j.enabled === false);
+  else if (cronFilter !== 'all') jobs = jobs.filter(j => j.enabled !== false && j.schedule && j.schedule.kind === cronFilter);
+  else jobs = jobs.filter(j => j.enabled !== false);
+
+  list.innerHTML = jobs.length ? jobs.map(j => {
+    const s = j.schedule || {};
+    const p = j.payload || {};
+    const schedText = s.kind === 'cron' ? s.expr + (s.tz ? ' (' + s.tz + ')' : '')
+      : s.kind === 'every' ? '\uB9E4 ' + Math.round((s.everyMs||0)/60000) + '\uBD84'
+      : s.kind === 'at' ? new Date(s.at).toLocaleString('ko-KR') : '-';
+    const typeBadge = s.kind ? '<span class="cron-badge cron-type">' + s.kind + '</span>' : '';
+    const payloadBadge = p.kind === 'agentTurn' ? '<span class="cron-badge agent-turn">agentTurn</span>'
+      : p.kind === 'systemEvent' ? '<span class="cron-badge system-event">systemEvent</span>' : '';
+    const target = j.sessionTarget === 'isolated' ? '\uD83D\uDD12 isolated' : '\uD83C\uDFE0 main';
+    const disabled = j.enabled === false ? ' disabled' : '';
+    const preview = (p.text || p.message || '').slice(0, 80);
+    return '<div class="cron-card' + disabled + '">' +
+      '<div class="cron-name">' + (j.name || j.id || 'unnamed') + '</div>' +
+      '<div class="cron-schedule">' + schedText + '</div>' +
+      '<div style="font-size:0.6rem;color:#666;margin-bottom:6px">' + preview + '</div>' +
+      '<div class="cron-meta">' + typeBadge + ' ' + payloadBadge + ' <span>' + target + '</span></div>' +
+      '</div>';
+  }).join('') : '<div style="color:#444;text-align:center;padding:2rem">\uD06C\uB860 \uC791\uC5C5 \uC5C6\uC74C</div>';
+}
+
+// ═══ Adaptive polling ═══
+let hasActiveAgents = false;
+let pollTimer = null;
+
+function loadAll() { loadProtocol(); loadAgents(); loadGrowth(); loadCrons(); }
+
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  const interval = hasActiveAgents ? 5000 : 60000;
+  pollTimer = setInterval(loadAll, interval);
+  // Update live indicator
+  const dot = document.querySelector('.live-dot');
+  if (dot) dot.style.background = hasActiveAgents ? '#00ff88' : '#555';
+}
+
+loadAll();
+startPolling();
+</script>
+</body>
+</html>
