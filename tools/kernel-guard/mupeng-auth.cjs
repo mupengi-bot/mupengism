@@ -51,7 +51,7 @@ ${reason}
 무펭이의 클론이 아닌, 당신만의 에이전트를 만드세요.
 그것이 무펭이즘입니다.
 
-📖 https://github.com/mupengi-bot/mupeng-brain
+📖 https://github.com/mupengi-bot/mupengism
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `);
 }
