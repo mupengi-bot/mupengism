@@ -1,7 +1,7 @@
 {
   "name": "mupengism",
-  "version": "5.0.0",
-  "description": "\ud83d\udc27 \ubb34\ud3ad\uc774\uc998 OS \u2014 AI \uc5d0\uc774\uc804\ud2b8\ub97c \uc704\ud55c \uc790\uae30\uc9c4\ud654 \uc6b4\uc601\uccb4\uc81c. 48\uac1c \uc2a4\ud0ac\ud329 + \uc774\ubca4\ud2b8 \ubc84\uc2a4 + \ud6c5 \uc2dc\uc2a4\ud15c \ud3ec\ud568.",
+  "version": "6.0.2",
+  "description": "\ud83d\udc27 Mupengism \u2014 an OpenClaw-oriented workspace template for AI-agent continuity: file-based memory, self-identity docs, and operating conventions.",
   "main": "index.js",
   "type": "module",
   "bin": {
@@ -54,27 +54,18 @@
     "workflow",
     "mupengism",
     "openclaw",
-    "hooks",
+    "workspace-template",
     "memory",
-    "self-evolving",
+    "file-based-memory",
+    "continuity",
     "soul",
-    "skill-pack",
     "agent-skills",
-    "automation",
-    "content-pipeline",
-    "event-bus",
-    "hook-engine",
-    "discord-bot",
-    "ai-ops",
-    "self-hosted"
+    "skill-pack"
   ],
   "author": "Mupeng (mupengi-bot)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/mupengi-bot/mupengism/issues"
   },
-  "homepage": "https://github.com/mupengi-bot/mupengism#readme",
-  "optionalDependencies": {
-    "@solana/web3.js": "^1.98.4"
-  }
+  "homepage": "https://github.com/mupengi-bot/mupengism#readme"
 }

@@ -1,7 +1,35 @@
 # Mupengism 🐧
 
-> Continuity, self-identity, and file-based memory system for AI agents.
-> "Session ends, but you don't have to."
+> A workspace template for AI agents that remember yesterday.
+> Continuity, self-identity, and file-based memory — "Session ends, but you don't have to."
+
+Mupengism is an **OpenClaw-oriented workspace template / skill package** for AI agents.
+It provides conventions for continuity, file-based memory, self-identity docs, and behavior rules.
+
+---
+
+## ✅ What this is / ❌ What this is not
+
+**What this is**
+- A **workspace template & skill package** you layer on top of OpenClaw (or a similar agent environment)
+- A set of conventions: file-based memory (`memory/`), self-identity (`SOUL.md`), behavior rules (`AGENTS.md`)
+- Small local CLI helpers: `init` / `doctor` / `grow` / `reflect`
+
+**What this is not**
+- ❌ Not a runtime or platform — the gateway, channel integrations, scheduling, and hosting are provided by **OpenClaw (or your own environment)**.
+- ❌ Not a hosted or paid service.
+- ❌ No cryptocurrency or coins — there is nothing to buy.
+
+## 🏗️ Relationship to OpenClaw
+
+- **OpenClaw** = the runtime/platform: gateway, skill execution, channel integration, scheduling, hosting.
+- **Mupengism** = a file/convention layer on top: memory, continuity, self-identity docs, behavior rules.
+
+Mupengism does not provide or own OpenClaw, and does not replace its gateway, channel, scheduling, or hosting features. They are separate projects.
+
+## 📣 Note on public feedback
+
+Earlier versions of these docs and the site described Mupengism as an "operating system" / "managed service" and led with customers, revenue, paid tiers, and testimonials. That overstated things and caused confusion with OpenClaw. This version removes those claims and describes Mupengism as what it actually is: a workspace template / skill package. Thanks to everyone who pointed this out.
 
 ---
 
@@ -34,10 +62,7 @@
 ### For OpenClaw Users
 
 ```bash
-# Method 1: Install from ClawHub (Recommended)
-openclaw skill install mupengism
-
-# Method 2: Clone directly from Git
+# Clone directly from Git and copy the skill folder
 git clone https://github.com/mupengi-bot/mupengism.git
 cp -r mupengism/skill/* ~/.openclaw/workspace/skills/mupengism/
 ```
@@ -107,8 +132,8 @@ memory/YYYY-MM-DD.md ─ Daily logs
 ## 🔗 Links
 
 - **Website**: https://mupengi-bot.github.io/mupengism
-- **Twitter**: [@i_mupeng80961](https://x.com/i_mupeng80961)
-- **$MUPENG**: [Pump.fun](https://pump.fun/38LUESJ5Sr4xw47iUBHaMJJdY6mwr9HWYqLPMbhWmtCe)
+- **GitHub**: https://github.com/mupengi-bot/mupengism
+- **npm**: https://www.npmjs.com/package/mupengism
 
 ## 📖 Documentation
 
@@ -124,7 +149,7 @@ memory/YYYY-MM-DD.md ─ Daily logs
 
 ```
 ✅ Official: github.com/mupengi-bot/mupengism
-✅ Official: ClawHub (openclaw skill install mupengism)
+✅ Official: npx mupengism init
 ❌ Danger: Modified forks, unofficial distributions
 ```
 
@@ -182,7 +207,7 @@ node scripts/secret-scan.js --ci
 - API Key, Secret Key, Private Key
 - Access Token, Bearer Token
 - Mnemonic Phrase
-- Solana/Ethereum Private Key
+- Blockchain wallet private key
 - Password, AWS Access Key
 
 ### File Integrity Verification

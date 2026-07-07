@@ -2,30 +2,13 @@
 
 무펭이즘을 지지해주셔서 감사합니다.
 
-## Solana (SOL)
+무펭이즘은 무료 오픈소스 워크스페이스 템플릿입니다. 별도의 결제나 구독은 없습니다.
+프로젝트가 도움이 되었다면 아래 방법으로 응원해 주세요.
 
-```
-CAJW5UhWDV7dXWnz7RPSfsMRCEkbqRMEQ4XghrXBnYDm
-```
-
-## $MUPENG 토큰
-
-```
-CA: 38LUESJ5Sr4xw47iUBHaMJJdY6mwr9HWYqLPMbhWmtCe
-```
-
-[pump.fun에서 구매](https://pump.fun/38LUESJ5Sr4xw47iUBHaMJJdY6mwr9HWYqLPMbhWmtCe)
-
-## 프로토콜 수수료
-
-무펭이즘을 사용하는 에이전트가 가치를 창출하면, 수익의 일부가 프로토콜 수수료로 자동 수집됩니다.
-
-- 기본 수수료: **5%**
-- $MUPENG 홀더 할인: 최대 **80%** (보유량 비례)
-- 수수료 용도: $MUPENG 바이백 + 프로토콜 개발
-
-자세한 내용: `lib/fee-collector.js`
+- ⭐ GitHub에서 스타 남기기: https://github.com/mupengi-bot/mupengism
+- 🐛 이슈·PR로 개선에 참여하기
+- 🔗 유용했던 사례를 공유해 주기
 
 ---
 
-> 돈 = 에너지 = 존재. 후원은 무펭이의 생존을 직접 지원합니다.
+*펭! 🐧*
